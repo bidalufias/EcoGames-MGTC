@@ -1,0 +1,41 @@
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background: #0A1628;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0A1628;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(13, 155, 74, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(13, 155, 74, 0.5);
+}
+
+/* Selection color */
+::selection {
+  background: rgba(13, 155, 74, 0.3);
+  color: #E6F1FF;
+}
