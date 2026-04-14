@@ -8,6 +8,7 @@ import LandingPage from './pages/LandingPage';
 import GamePage from './pages/GamePage';
 
 const ClimateNinjaGame = lazy(() => import('./games/climate-ninja/ClimateNinjaGame'));
+const CarbonCrushGame = lazy(() => import('./games/carbon-crush/CarbonCrushGame'));
 
 function App() {
   return (
@@ -27,6 +28,11 @@ function App() {
             <Route path="/games/climate-ninja" element={
               <Suspense fallback={<Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8892B0' }}>Loading Climate Ninja...</Box>}>
                 <ClimateNinjaGame />
+              </Suspense>
+            } />
+            <Route path="/games/carbon-crush" element={
+              <Suspense fallback={<Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8892B0' }}>Loading Carbon Crush...</Box>}>
+                <CarbonCrushGame />
               </Suspense>
             } />
             <Route path="/games/:gameId" element={<GamePage />} />
