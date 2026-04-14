@@ -1,10 +1,13 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { Box } from '@mui/material';
+import { Suspense, lazy } from 'react';
 import { ecoTheme } from './theme/ecoTheme';
 import EcoHeader from './components/EcoHeader';
 import LandingPage from './pages/LandingPage';
 import GamePage from './pages/GamePage';
+
+const ClimateNinjaGame = lazy(() => import('./games/climate-ninja/ClimateNinjaGame'));
 
 function App() {
   return (
@@ -21,6 +24,11 @@ function App() {
           <EcoHeader />
           <Routes>
             <Route path="/" element={<LandingPage />} />
+            <Route path="/games/climate-ninja" element={
+              <Suspense fallback={<Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8892B0' }}>Loading Climate Ninja...</Box>}>
+                <ClimateNinjaGame />
+              </Suspense>
+            } />
             <Route path="/games/:gameId" element={<GamePage />} />
           </Routes>
         </BrowserRouter>
