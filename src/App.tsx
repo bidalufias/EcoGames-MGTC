@@ -9,6 +9,10 @@ import GamePage from './pages/GamePage';
 
 const ClimateNinjaGame = lazy(() => import('./games/climate-ninja/ClimateNinjaGame'));
 const CarbonCrushGame = lazy(() => import('./games/carbon-crush/CarbonCrushGame'));
+const RecycleRushGame = lazy(() => import('./games/recycle-rush/RecycleRushGame'));
+const EcoMemoryGame = lazy(() => import('./games/eco-memory/EcoMemoryGame'));
+const GreenDefenceGame = lazy(() => import('./games/green-defence/GreenDefenceGame'));
+const Climate2048Game = lazy(() => import('./games/climate-2048/Climate2048Game'));
 
 function App() {
   return (
@@ -33,6 +37,26 @@ function App() {
             <Route path="/games/carbon-crush" element={
               <Suspense fallback={<Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8892B0' }}>Loading Carbon Crush...</Box>}>
                 <CarbonCrushGame />
+              </Suspense>
+            } />
+            <Route path="/games/recycle-rush" element={
+              <Suspense fallback={<Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8892B0' }}>Loading Recycle Rush...</Box>}>
+                <RecycleRushGame />
+              </Suspense>
+            } />
+            <Route path="/games/eco-memory" element={
+              <Suspense fallback={<Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8892B0' }}>Loading Eco Memory...</Box>}>
+                <EcoMemoryGame />
+              </Suspense>
+            } />
+            <Route path="/games/green-defence" element={
+              <Suspense fallback={<Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8892B0' }}>Loading Green Defence...</Box>}>
+                <GreenDefenceGame />
+              </Suspense>
+            } />
+            <Route path="/games/climate-2048" element={
+              <Suspense fallback={<Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8892B0' }}>Loading Climate 2048...</Box>}>
+                <Climate2048Game />
               </Suspense>
             } />
             <Route path="/games/:gameId" element={<GamePage />} />
