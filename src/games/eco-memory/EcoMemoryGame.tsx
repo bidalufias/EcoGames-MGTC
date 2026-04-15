@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useMediaQuery } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createCards, GHG_PAIRS } from './data';
 import type { Card } from './data';
@@ -16,15 +16,18 @@ export default function EcoMemoryGame() {
   const [fact, setFact] = useState('');
   const [locked, setLocked] = useState(false);
 
+  const isLandscape = useMediaQuery('(orientation: landscape)');
+  const isSmall = useMediaQuery('(max-height: 500px)');
+
   const totalPairs = GHG_PAIRS.length;
+  const totalCards = totalPairs * 2;
+  const cols = isLandscape ? (totalCards <= 16 ? 4 : 5) : 4;
+  const gap = 8;
+  const availH = isSmall ? '70vh' : '78vh';
 
   const startGame = useCallback(() => {
     setCards(createCards());
-    setFlipped([]);
-    setMoves(0);
-    setMatches(0);
-    setFact('');
-    setLocked(false);
+    setFlipped([]); setMoves(0); setMatches(0); setFact(''); setLocked(false);
     setScreen('playing');
   }, []);
 
@@ -47,15 +50,13 @@ export default function EcoMemoryGame() {
         setFact(`💡 ${first.fact}`);
         setTimeout(() => {
           setCards(prev => prev.map(c => c.pairId === first.pairId ? { ...c, matched: true } : c));
-          setFlipped([]);
-          setLocked(false);
+          setFlipped([]); setLocked(false);
           setTimeout(() => setFact(''), 3000);
         }, 500);
       } else {
         setTimeout(() => {
           setCards(prev => prev.map(c => newFlipped.includes(c.id) ? { ...c, flipped: false } : c));
-          setFlipped([]);
-          setLocked(false);
+          setFlipped([]); setLocked(false);
         }, 1000);
       }
     }
@@ -77,14 +78,11 @@ export default function EcoMemoryGame() {
           <Typography variant="h3" sx={{
             background: 'linear-gradient(135deg, #9B59B6, #007DC4)',
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontWeight: 800, mb: 2,
-          }} align="center">
-            🧠 Eco Memory
-          </Typography>
+          }} align="center">🧠 Eco Memory</Typography>
           <Typography variant="h6" sx={{ color: '#5A6A7E', mb: 4 }} align="center">
             Match greenhouse gases to their sources and effects!
           </Typography>
         </motion.div>
-
         <Box sx={{ maxWidth: 600, mb: 3 }}>
           <Typography sx={{ mb: 2, color: '#1A2332' }} align="center">Match each gas to its source:</Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
@@ -95,12 +93,10 @@ export default function EcoMemoryGame() {
             ))}
           </Box>
         </Box>
-
         <Typography sx={{ color: '#5A6A7E', mb: 3, maxWidth: 450, textAlign: 'center' }}>
           Flip cards to find matching pairs. Each match reveals a climate fact!
           Try to match all {totalPairs} pairs in as few moves as possible.
         </Typography>
-
         <EcoButton onClick={startGame} size="large">Start Matching 🧠</EcoButton>
       </Box>
     );
@@ -134,64 +130,86 @@ export default function EcoMemoryGame() {
   return (
     <Box sx={{
       height: '100vh', bgcolor: '#F0F3F7', color: '#1A2332',
-      display: 'flex', flexDirection: 'column', alignItems: 'center', py: 8, px: 2,
-      overflow: 'hidden',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      px: 2, py: 1, overflow: 'hidden', width: '100vw',
     }}>
       {/* HUD */}
-      <Box sx={{ display: 'flex', gap: 4, mb: 3 }}>
+      <Box sx={{ display: 'flex', gap: 4, mb: 1, flexShrink: 0 }}>
         <Box sx={{ textAlign: 'center' }}>
-          <Typography sx={{ fontSize: 12, color: '#8892B0' }}>MOVES</Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800 }}>{moves}</Typography>
+          <Typography sx={{ fontSize: 11, color: '#5A6A7E' }}>MOVES</Typography>
+          <Typography sx={{ fontWeight: 800, fontSize: 20 }}>{moves}</Typography>
         </Box>
         <Box sx={{ textAlign: 'center' }}>
-          <Typography sx={{ fontSize: 12, color: '#8892B0' }}>MATCHES</Typography>
-          <Typography variant="h5" sx={{ fontWeight: 800, color: '#9B59B6' }}>{matches}/{totalPairs}</Typography>
+          <Typography sx={{ fontSize: 11, color: '#5A6A7E' }}>MATCHES</Typography>
+          <Typography sx={{ fontWeight: 800, fontSize: 20, color: '#9B59B6' }}>{matches}/{totalPairs}</Typography>
         </Box>
       </Box>
 
-      {/* Card Grid */}
+      {/* Card Grid — responsive, no layout shift */}
       <Box sx={{
-        display: 'grid', gridTemplateColumns: { xs: 'repeat(4, 1fr)', sm: 'repeat(4, 1fr)' },
-        gap: 1.5, maxWidth: 440, width: '100%',
+        display: 'grid',
+        gridTemplateColumns: `repeat(${cols}, 1fr)`,
+        gap: `${gap}px`,
+        width: `min(95vw, ${isLandscape ? '80vh' : '95vw'})`,
+        maxHeight: availH,
       }}>
-        <AnimatePresence>
-          {cards.map(card => (
-            <motion.div key={card.id} layout initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.2 }}>
-              <Box
-                onClick={() => handleCardClick(card.id)}
-                sx={{
-                  aspectRatio: '1', borderRadius: 2, cursor: 'pointer',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                  background: card.matched
-                    ? `${card.color}15`
-                    : card.flipped
-                      ? '#FFFFFF'
-                      : '#FFFFFF',
-                  border: `2px solid ${card.matched ? card.color : card.flipped ? card.color : '#E8EDF2'}`,
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                  transition: 'all 0.3s',
-                  '&:hover': !card.flipped && !card.matched ? { borderColor: `${card.color}55`, transform: 'scale(1.05)' } : {},
-                  opacity: card.matched ? 0.6 : 1,
-                  p: 1,
-                }}
-              >
-                {card.flipped || card.matched ? (
-                  <>
-                    <Typography sx={{ fontSize: { xs: 24, sm: 32 } }}>{card.emoji}</Typography>
-                    <Typography sx={{ fontSize: { xs: 8, sm: 10 }, color: card.color, fontWeight: 700, textAlign: 'center', mt: 0.5 }}>
-                      {card.label}
-                    </Typography>
-                  </>
-                ) : (
-                  <Typography sx={{ fontSize: { xs: 28, sm: 36 } }}>🌱</Typography>
-                )}
+        {cards.map(card => {
+          const isOpen = card.flipped || card.matched;
+          return (
+            <Box
+              key={card.id}
+              onClick={() => handleCardClick(card.id)}
+              sx={{
+                aspectRatio: '1',
+                borderRadius: 2,
+                cursor: card.matched ? 'default' : 'pointer',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: card.matched ? `${card.color}10` : '#FFFFFF',
+                border: `2px solid ${card.matched ? card.color : isOpen ? card.color : '#D0D7E0'}`,
+                boxShadow: isOpen ? `0 2px 8px ${card.color}20` : '0 1px 3px rgba(0,0,0,0.06)',
+                transition: 'border-color 0.2s, box-shadow 0.2s, background 0.2s',
+                '&:hover': !card.flipped && !card.matched ? {
+                  borderColor: `${card.color}55`,
+                  boxShadow: `0 2px 8px ${card.color}15`,
+                } : {},
+                opacity: card.matched ? 0.5 : 1,
+                overflow: 'hidden',
+                p: '6%',
+              }}
+            >
+              {/* Icon — always same space */}
+              <Box sx={{
+                fontSize: 'clamp(20px, 5vw, 36px)',
+                lineHeight: 1,
+              }}>
+                {isOpen ? card.emoji : '🌱'}
               </Box>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+              {/* Label — always same height, hidden text for face-down */}
+              <Box sx={{
+                mt: 0.5,
+                fontSize: 'clamp(7px, 1.8vw, 11px)',
+                fontWeight: 700,
+                color: isOpen ? card.color : 'transparent',
+                textAlign: 'center',
+                lineHeight: 1.1,
+                minHeight: '1.2em',
+                maxWidth: '100%',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                transition: 'color 0.2s',
+              }}>
+                {isOpen ? card.label : '•'}
+              </Box>
+            </Box>
+          );
+        })}
       </Box>
 
-      {/* Fact */}
+      {/* Fact popup */}
       <AnimatePresence>
         {fact && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
