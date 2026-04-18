@@ -1,4 +1,4 @@
-import { Box, Typography, Chip } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,9 +18,9 @@ export default function GameTile({ id, title, description, icon, color, availabl
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.07, ease: 'easeOut' }}
+      initial={{ opacity: 0, y: 12, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.35, delay: index * 0.06, ease: 'easeOut' }}
       style={{ height: '100%' }}
     >
       <Box
@@ -29,110 +29,82 @@ export default function GameTile({ id, title, description, icon, color, availabl
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
-          background: '#FFFFFF',
-          border: '1px solid #F1F5F9',
+          background: `linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)`,
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255,255,255,0.08)',
           borderRadius: '16px',
           overflow: 'hidden',
           cursor: available ? 'pointer' : 'default',
-          transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           '&:hover': available ? {
-            boxShadow: `0 8px 30px ${color}18, 0 2px 8px rgba(0,0,0,0.06)`,
-            transform: 'translateY(-2px)',
-            borderColor: `${color}40`,
+            transform: 'translateY(-4px) scale(1.02)',
+            boxShadow: `0 12px 40px ${color}30, 0 0 60px ${color}10`,
+            border: `1px solid ${color}50`,
+            background: `linear-gradient(135deg, ${color}15 0%, rgba(255,255,255,0.06) 100%)`,
           } : {},
         }}
       >
-        {/* Color accent top bar */}
-        <Box
-          sx={{
-            height: 3,
-            background: color,
-          }}
-        />
+        {/* Glow accent top */}
+        <Box sx={{
+          height: 2,
+          background: `linear-gradient(90deg, transparent 0%, ${color} 50%, transparent 100%)`,
+          opacity: 0.7,
+        }} />
 
-        <Box sx={{ p: { xs: 2.5, md: 3 }, flex: 1, display: 'flex', flexDirection: 'column' }}>
-          {/* Icon circle */}
-          <Box
-            sx={{
-              width: { xs: 52, md: 60 },
-              height: { xs: 52, md: 60 },
-              borderRadius: '14px',
-              background: `${color}10`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              mb: 2,
-            }}
-          >
-            <Typography sx={{ fontSize: { xs: '28px', md: '32px' }, lineHeight: 1 }}>
-              {icon}
-            </Typography>
+        <Box sx={{ p: { xs: 1.5, sm: 2, md: 2.5 }, flex: 1, display: 'flex', flexDirection: 'column' }}>
+          {/* Icon + Title row */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
+            <Box sx={{
+              width: { xs: 40, sm: 46, md: 50 }, height: { xs: 40, sm: 46, md: 50 },
+              borderRadius: '12px', background: `${color}18`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: `0 0 20px ${color}15`,
+              flexShrink: 0,
+            }}>
+              <Typography sx={{ fontSize: { xs: '22px', md: '26px' }, lineHeight: 1 }}>{icon}</Typography>
+            </Box>
+            <Box sx={{ minWidth: 0 }}>
+              <Typography sx={{
+                fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2,
+                fontSize: { xs: '0.9rem', md: '1.05rem' }, letterSpacing: '-0.01em',
+                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+              }}>
+                {title}
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 0.5, mt: 0.3 }}>
+                {tags.map((tag) => (
+                  <Box key={tag} component="span" sx={{
+                    fontSize: '0.6rem', fontWeight: 600, color: `${color}`,
+                    background: `${color}15`, px: 0.8, py: 0.1, borderRadius: '4px',
+                    letterSpacing: '0.03em', textTransform: 'uppercase',
+                  }}>
+                    {tag}
+                  </Box>
+                ))}
+              </Box>
+            </Box>
           </Box>
 
-          {/* Title */}
-          <Typography
-            sx={{
-              fontWeight: 700,
-              mb: 0.5,
-              color: '#0F172A',
-              fontSize: { xs: '1.05rem', md: '1.15rem' },
-              letterSpacing: '-0.01em',
-            }}
-          >
-            {title}
-          </Typography>
-
           {/* Description */}
-          <Typography
-            sx={{
-              color: '#64748B',
-              mb: 2,
-              lineHeight: 1.55,
-              fontSize: { xs: '0.82rem', md: '0.88rem' },
-              flex: 1,
-            }}
-          >
+          <Typography sx={{
+            color: 'rgba(255,255,255,0.45)', lineHeight: 1.4, flex: 1,
+            fontSize: { xs: '0.72rem', md: '0.8rem' }, mb: 1.5,
+          }}>
             {description}
           </Typography>
 
-          {/* Tags */}
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
-            {tags.map((tag) => (
-              <Chip
-                key={tag}
-                label={tag}
-                size="small"
-                sx={{
-                  background: '#F8FAFC',
-                  color: '#64748B',
-                  border: '1px solid #E2E8F0',
-                  fontWeight: 500,
-                  fontSize: '0.7rem',
-                  height: 22,
-                  '& .MuiChip-label': { px: 1 },
-                }}
-              />
-            ))}
-          </Box>
-
           {/* Play CTA */}
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 0.5,
-              py: 1,
-              borderRadius: '10px',
-              background: available ? color : '#F1F5F9',
-              color: available ? '#FFFFFF' : '#94A3B8',
-              fontWeight: 600,
-              fontSize: '0.85rem',
-              transition: 'all 0.2s',
-            }}
-          >
-            {available ? 'Play Now' : 'Coming Soon'}
+          <Box sx={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            py: { xs: 0.7, md: 0.9 }, borderRadius: '10px',
+            background: available ? `linear-gradient(135deg, ${color} 0%, ${color}CC 100%)` : 'rgba(255,255,255,0.05)',
+            color: available ? '#FFFFFF' : 'rgba(255,255,255,0.2)',
+            fontWeight: 700, fontSize: { xs: '0.72rem', md: '0.82rem' },
+            letterSpacing: '0.02em',
+            transition: 'all 0.2s',
+            boxShadow: available ? `0 4px 15px ${color}40` : 'none',
+          }}>
+            {available ? '▶  Play Now' : 'Coming Soon'}
           </Box>
         </Box>
       </Box>

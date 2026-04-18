@@ -87,7 +87,7 @@ function App() {
   return (
     <ThemeProvider theme={ecoTheme}>
       <CssBaseline />
-      <Box sx={{ minHeight: '100vh', background: '#FFFFFF' }}>
+      <Box sx={{ height: '100vh', width: '100vw', overflow: 'hidden', background: '#0F172A' }}>
         <BrowserRouter>
           <AppLayout />
         </BrowserRouter>
