@@ -9,8 +9,9 @@ import {
 } from './engine';
 import type { Tile } from './engine';
 import EcoButton from '../../components/EcoButton';
+import LeaderboardPanel from '../../components/LeaderboardPanel';
 
-type Screen = 'intro' | 'playing' | 'gameover';
+type Screen = 'intro' | 'playing' | 'gameover' | 'leaderboard';
 
 const FACTS = [
   '💡 In 2023, renewable energy generated 30% of global electricity',
@@ -24,6 +25,7 @@ const FACTS = [
 
 export default function CarbonCrushGame() {
   const [screen, setScreen] = useState<Screen>('intro');
+  const [playerName, setPlayerName] = useState('');
   const [grid, setGrid] = useState<Tile[][]>([]);
   const [selected, setSelected] = useState<{ row: number; col: number } | null>(null);
   const [score, setScore] = useState(0);
@@ -168,6 +170,25 @@ export default function CarbonCrushGame() {
     );
   }
 
+  // --- Leaderboard ---
+  if (screen === 'leaderboard') {
+    return (
+      <Box sx={{
+        minHeight: '100vh', bgcolor: '#FAFBFC', color: '#1A2332',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        px: 3, py: 4,
+      }}>
+        <Typography variant="h4" sx={{ fontWeight: 800, mb: 4 }}>🏆 Carbon Crush Leaderboard</Typography>
+        <Box sx={{ width: '100%', maxWidth: 500 }}>
+          <LeaderboardPanel gameId="carbon-crush" playerName={playerName} />
+        </Box>
+        <Box sx={{ mt: 4 }}>
+          <EcoButton onClick={startGame}>Play Again</EcoButton>
+        </Box>
+      </Box>
+    );
+  }
+
   // --- Game Over ---
   if (screen === 'gameover') {
     return (
@@ -187,9 +208,30 @@ export default function CarbonCrushGame() {
             </Typography>
           )}
         </motion.div>
-        <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-          <EcoButton onClick={startGame}>Play Again</EcoButton>
-          <EcoButton onClick={() => setScreen('intro')} variant="secondary">Info</EcoButton>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, mt: 2 }}>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+            <input
+              value={playerName}
+              onChange={e => setPlayerName(e.target.value)}
+              placeholder="Your name"
+              maxLength={20}
+              style={{
+                padding: '8px 16px', borderRadius: '8px', border: '1px solid rgba(13,155,74,0.3)',
+                fontSize: '1rem', outline: 'none', width: 160,
+              }}
+            />
+            <EcoButton onClick={async () => {
+              if (playerName.trim()) {
+                const { submitScore } = await import('../../lib/supabase');
+                await submitScore({ game_id: 'carbon-crush', player_name: playerName.trim(), score });
+              }
+              setScreen('leaderboard');
+            }}>🏆 Leaderboard</EcoButton>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <EcoButton onClick={startGame}>Play Again</EcoButton>
+            <EcoButton onClick={() => setScreen('intro')} variant="secondary">Info</EcoButton>
+          </Box>
         </Box>
       </Box>
     );
