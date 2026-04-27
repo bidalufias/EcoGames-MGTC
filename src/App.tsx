@@ -43,7 +43,7 @@ function AppLayout() {
 
   return (
     <>
-      <MgtcLogo />
+      {isGamePage && <MgtcLogo />}
       {isGamePage && <BackToHome />}
       <Routes>
         <Route path="/" element={<LandingPage />} />
