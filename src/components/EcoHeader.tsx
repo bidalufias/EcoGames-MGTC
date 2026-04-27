@@ -1,35 +1,30 @@
 import { Box, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MGTC_GREEN, MGTC_BLUE } from '../theme/ecoTheme';
 
-export default function EcoHeader() {
-  const navigate = useNavigate();
+interface EcoHeaderProps {
+  tagline?: string;
+}
 
+export default function EcoHeader({ tagline = 'Six classic games. One climate mission.' }: EcoHeaderProps) {
   return (
     <motion.div
-      initial={{ y: -20, opacity: 0 }}
+      initial={{ y: -12, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
     >
       <Box
-        onClick={() => navigate('/')}
         sx={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 1000,
-          px: { xs: 2, sm: 4 },
-          py: 1.5,
+          height: 56,
+          px: { xs: 2, sm: 3, md: 4 },
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: 'rgba(255, 255, 255, 0.92)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
+          background: 'rgba(255,255,255,0.82)',
+          backdropFilter: 'blur(18px)',
+          WebkitBackdropFilter: 'blur(18px)',
           borderBottom: '1px solid #E8EDF2',
-          cursor: 'pointer',
+          userSelect: 'none',
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -37,21 +32,37 @@ export default function EcoHeader() {
             component="img"
             src="/mgtc-logo.png"
             alt="MGTC"
-            sx={{ height: 32, width: 'auto' }}
+            sx={{ height: 30, width: 'auto', display: 'block' }}
           />
+          <Box sx={{ width: '1px', height: 24, background: '#E2E8F0' }} />
           <Typography
             sx={{
-              fontSize: { xs: '1.1rem', sm: '1.3rem' },
+              fontSize: { xs: '1.05rem', md: '1.2rem' },
               fontWeight: 800,
               background: `linear-gradient(135deg, ${MGTC_GREEN}, ${MGTC_BLUE})`,
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               letterSpacing: '-0.02em',
+              lineHeight: 1,
             }}
           >
             EcoGames
           </Typography>
         </Box>
+
+        {tagline && (
+          <Typography
+            sx={{
+              display: { xs: 'none', sm: 'block' },
+              color: '#64748B',
+              fontSize: { sm: '0.75rem', md: '0.82rem' },
+              fontWeight: 500,
+              letterSpacing: '0.02em',
+            }}
+          >
+            {tagline}
+          </Typography>
+        )}
       </Box>
     </motion.div>
   );
