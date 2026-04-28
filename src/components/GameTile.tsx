@@ -22,21 +22,22 @@ interface GameTileProps {
 // readable on both small (~280px tall) and large (~600px tall) cards.
 const FLUID = {
   bodyPad: 'clamp(14px, 3.6cqh, 24px)',
-  groupGap: 'clamp(6px, 1.8cqh, 14px)', // gap between elements *inside* a group
+  groupGap: 'clamp(6px, 1.8cqh, 14px)', // gap *inside* the top sub-group
+  minSectionGap: 'clamp(8px, 2.2cqh, 18px)', // minimum gap between body sections
   iconPlate: 'clamp(54px, 18cqh, 96px)',
   iconRadius: 'clamp(14px, 3.5cqh, 22px)',
   iconFont: 'clamp(28px, 10cqh, 50px)',
   titleFont: 'clamp(0.95rem, 4cqh, 1.4rem)',
   inspiredFont: 'clamp(0.62rem, 1.9cqh, 0.78rem)',
-  descFont: 'clamp(0.72rem, 2.4cqh, 0.92rem)',
-  learnPx: 'clamp(8px, 1.6cqh, 14px)',
-  learnPy: 'clamp(5px, 1.2cqh, 10px)',
-  learnFont: 'clamp(0.65rem, 2.1cqh, 0.82rem)',
-  metaFont: 'clamp(0.6rem, 1.8cqh, 0.76rem)',
+  descFont: 'clamp(0.85rem, 2.9cqh, 1.05rem)',
+  learnPx: 'clamp(10px, 2cqh, 16px)',
+  learnPy: 'clamp(6px, 1.5cqh, 12px)',
+  learnFont: 'clamp(0.78rem, 2.55cqh, 0.95rem)',
+  metaFont: 'clamp(0.66rem, 2.0cqh, 0.82rem)',
   metaGap: 'clamp(8px, 2cqh, 14px)',
-  ctaPy: 'clamp(8px, 2.4cqh, 14px)',
+  ctaPy: 'clamp(9px, 2.6cqh, 15px)',
   ctaRadius: 'clamp(10px, 2cqh, 14px)',
-  ctaFont: 'clamp(0.78rem, 2.4cqh, 0.96rem)',
+  ctaFont: 'clamp(0.82rem, 2.5cqh, 1rem)',
   topicPx: 'clamp(8px, 1.6cqh, 12px)',
   topicPy: 'clamp(3px, 0.8cqh, 5px)',
   topicFont: 'clamp(0.55rem, 1.5cqh, 0.68rem)',
@@ -119,9 +120,9 @@ export default function GameTile({
           {icon}
         </Box>
 
-        {/* Body — three groups (top / middle / bottom) distributed via
-            space-between, so the description always sits equidistant from the
-            top and bottom blocks regardless of card height. */}
+        {/* Body — five flex children (top group / description / learn / meta /
+            CTA) distributed via space-between, so the four gaps between them
+            are always equal regardless of card height. */}
         <Box
           sx={{
             flex: 1,
@@ -133,12 +134,12 @@ export default function GameTile({
             alignItems: 'stretch',
             textAlign: 'center',
             padding: FLUID.bodyPad,
-            gap: FLUID.groupGap,
+            gap: FLUID.minSectionGap,
             position: 'relative',
             zIndex: 1,
           }}
         >
-          {/* Top group: topic chip + icon + title */}
+          {/* Top group: topic chip + icon + title (tight internal rhythm) */}
           <Box
             sx={{
               display: 'flex',
@@ -195,7 +196,7 @@ export default function GameTile({
               </Typography>
             </Box>
 
-            {/* Title group (title + inspired-by, tight internal spacing) */}
+            {/* Title group (title + inspired-by) */}
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
               <Typography
                 sx={{
@@ -223,11 +224,10 @@ export default function GameTile({
             </Box>
           </Box>
 
-          {/* Middle: description — sits equidistant from top and bottom groups */}
+          {/* Description */}
           <Typography
             component="div"
             sx={{
-              alignSelf: 'stretch',
               color: '#475569',
               lineHeight: 1.45,
               fontSize: FLUID.descFont,
@@ -239,94 +239,87 @@ export default function GameTile({
             {description}
           </Typography>
 
-          {/* Bottom group: learn + meta + CTA */}
+          {/* What you'll learn — centered, more prominent */}
           <Box
             sx={{
+              background: `${accent}14`,
+              border: `1px solid ${accent}2E`,
+              borderRadius: 'clamp(8px, 1.8cqh, 12px)',
+              px: FLUID.learnPx,
+              py: FLUID.learnPy,
               display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'stretch',
-              gap: FLUID.groupGap,
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 'clamp(5px, 1.2cqh, 9px)',
+              textAlign: 'center',
               flexShrink: 0,
             }}
           >
-            {/* What you'll learn */}
-            <Box
+            <Box sx={{ fontSize: 'clamp(0.85rem, 2.6cqh, 1.05rem)', lineHeight: 1, flexShrink: 0 }}>📚</Box>
+            <Typography
+              component="div"
               sx={{
-                background: `${accent}14`,
-                border: `1px solid ${accent}2E`,
-                borderRadius: 'clamp(8px, 1.8cqh, 12px)',
-                px: FLUID.learnPx,
-                py: FLUID.learnPy,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'clamp(4px, 1cqh, 8px)',
-                textAlign: 'left',
-              }}
-            >
-              <Box sx={{ fontSize: 'clamp(0.78rem, 2.4cqh, 0.95rem)', lineHeight: 1, flexShrink: 0 }}>📚</Box>
-              <Typography
-                component="div"
-                sx={{
-                  color: '#1E293B',
-                  fontSize: FLUID.learnFont,
-                  fontWeight: 600,
-                  lineHeight: 1.3,
-                  minWidth: 0,
-                }}
-              >
-                <Box component="span" sx={{ color: accent, fontWeight: 800 }}>Learn:</Box>{' '}
-                {learn}
-              </Typography>
-            </Box>
-
-            {/* Meta row */}
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                gap: FLUID.metaGap,
-                fontSize: FLUID.metaFont,
-                color: '#64748B',
+                color: '#1E293B',
+                fontSize: FLUID.learnFont,
                 fontWeight: 600,
-                lineHeight: 1,
+                lineHeight: 1.35,
+                minWidth: 0,
               }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 'clamp(2px, 0.6cqh, 5px)' }}>
-                <Box component="span" sx={{ fontSize: 'clamp(0.7rem, 2.1cqh, 0.85rem)' }}>⚡</Box>
-                {difficulty}
-              </Box>
-              <Box sx={{ width: '1px', background: '#CBD5E1' }} />
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 'clamp(2px, 0.6cqh, 5px)' }}>
-                <Box component="span" sx={{ fontSize: 'clamp(0.7rem, 2.1cqh, 0.85rem)' }}>⏱</Box>
-                {playTime}
-              </Box>
-            </Box>
+              <Box component="span" sx={{ color: accent, fontWeight: 800 }}>Learn:</Box>{' '}
+              {learn}
+            </Typography>
+          </Box>
 
-            {/* Play CTA */}
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 'clamp(4px, 1cqh, 8px)',
-                py: FLUID.ctaPy,
-                borderRadius: FLUID.ctaRadius,
-                background: available
-                  ? `linear-gradient(135deg, ${accent} 0%, ${accent}E6 100%)`
-                  : '#E0E0E0',
-                color: available ? '#FFFFFF' : '#9E9E9E',
-                fontWeight: 800,
-                fontSize: FLUID.ctaFont,
-                letterSpacing: '0.04em',
-                textTransform: 'uppercase',
-                boxShadow: available
-                  ? `0 5px 14px ${accent}50, inset 0 1px 0 rgba(255,255,255,0.25)`
-                  : 'none',
-              }}
-            >
-              <Box component="span" sx={{ fontSize: '0.78em' }}>▶</Box>
-              {available ? 'Play Now' : 'Coming Soon'}
+          {/* Meta row */}
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: FLUID.metaGap,
+              fontSize: FLUID.metaFont,
+              color: '#64748B',
+              fontWeight: 600,
+              lineHeight: 1,
+              flexShrink: 0,
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 'clamp(2px, 0.6cqh, 5px)' }}>
+              <Box component="span" sx={{ fontSize: 'clamp(0.74rem, 2.2cqh, 0.9rem)' }}>⚡</Box>
+              {difficulty}
             </Box>
+            <Box sx={{ width: '1px', background: '#CBD5E1' }} />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 'clamp(2px, 0.6cqh, 5px)' }}>
+              <Box component="span" sx={{ fontSize: 'clamp(0.74rem, 2.2cqh, 0.9rem)' }}>⏱</Box>
+              {playTime}
+            </Box>
+          </Box>
+
+          {/* Play CTA */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 'clamp(4px, 1cqh, 8px)',
+              py: FLUID.ctaPy,
+              borderRadius: FLUID.ctaRadius,
+              background: available
+                ? `linear-gradient(135deg, ${accent} 0%, ${accent}E6 100%)`
+                : '#E0E0E0',
+              color: available ? '#FFFFFF' : '#9E9E9E',
+              fontWeight: 800,
+              fontSize: FLUID.ctaFont,
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
+              flexShrink: 0,
+              boxShadow: available
+                ? `0 5px 14px ${accent}50, inset 0 1px 0 rgba(255,255,255,0.25)`
+                : 'none',
+            }}
+          >
+            <Box component="span" sx={{ fontSize: '0.78em' }}>▶</Box>
+            {available ? 'Play Now' : 'Coming Soon'}
           </Box>
         </Box>
       </Box>
