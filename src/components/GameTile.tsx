@@ -21,8 +21,8 @@ interface GameTileProps {
 // via container query height units. clamp(min, preferred, max) keeps things
 // readable on both small (~280px tall) and large (~600px tall) cards.
 const FLUID = {
-  bodyPad: 'clamp(12px, 3.4cqh, 22px)',
-  bodyGap: 'clamp(4px, 1.4cqh, 12px)',
+  bodyPad: 'clamp(14px, 3.6cqh, 24px)',
+  groupGap: 'clamp(6px, 1.8cqh, 14px)', // gap between elements *inside* a group
   iconPlate: 'clamp(54px, 18cqh, 96px)',
   iconRadius: 'clamp(14px, 3.5cqh, 22px)',
   iconFont: 'clamp(28px, 10cqh, 50px)',
@@ -30,7 +30,7 @@ const FLUID = {
   inspiredFont: 'clamp(0.62rem, 1.9cqh, 0.78rem)',
   descFont: 'clamp(0.72rem, 2.4cqh, 0.92rem)',
   learnPx: 'clamp(8px, 1.6cqh, 14px)',
-  learnPy: 'clamp(4px, 1.1cqh, 9px)',
+  learnPy: 'clamp(5px, 1.2cqh, 10px)',
   learnFont: 'clamp(0.65rem, 2.1cqh, 0.82rem)',
   metaFont: 'clamp(0.6rem, 1.8cqh, 0.76rem)',
   metaGap: 'clamp(8px, 2cqh, 14px)',
@@ -119,7 +119,9 @@ export default function GameTile({
           {icon}
         </Box>
 
-        {/* Body */}
+        {/* Body — three groups (top / middle / bottom) distributed via
+            space-between, so the description always sits equidistant from the
+            top and bottom blocks regardless of card height. */}
         <Box
           sx={{
             flex: 1,
@@ -127,191 +129,204 @@ export default function GameTile({
             minWidth: 0,
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center',
+            justifyContent: 'space-between',
+            alignItems: 'stretch',
             textAlign: 'center',
             padding: FLUID.bodyPad,
-            gap: FLUID.bodyGap,
+            gap: FLUID.groupGap,
             position: 'relative',
             zIndex: 1,
           }}
         >
-          {/* Topic chip — top right */}
+          {/* Top group: topic chip + icon + title */}
           <Box
             sx={{
-              alignSelf: 'flex-end',
-              background: '#FFFFFF',
-              color: accent,
-              border: `1px solid ${accent}40`,
-              borderRadius: '999px',
-              px: FLUID.topicPx,
-              py: FLUID.topicPy,
-              fontSize: FLUID.topicFont,
-              fontWeight: 800,
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              lineHeight: 1,
-              boxShadow: `0 1px 3px ${accent}20`,
-              flexShrink: 0,
-            }}
-          >
-            {topic}
-          </Box>
-
-          {/* Icon plate */}
-          <Box
-            sx={{
-              width: FLUID.iconPlate,
-              height: FLUID.iconPlate,
-              borderRadius: FLUID.iconRadius,
-              background: `linear-gradient(140deg, ${accent} 0%, ${accent}D0 100%)`,
               display: 'flex',
+              flexDirection: 'column',
               alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: `0 8px 22px ${accent}50, inset 0 -3px 8px rgba(0,0,0,0.12), inset 0 2px 4px rgba(255,255,255,0.25)`,
+              gap: FLUID.groupGap,
               flexShrink: 0,
             }}
           >
-            <Typography
+            {/* Topic chip — top right */}
+            <Box
               sx={{
-                fontSize: FLUID.iconFont,
-                lineHeight: 1,
-                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))',
-              }}
-            >
-              {icon}
-            </Typography>
-          </Box>
-
-          {/* Title group (title + inspired-by, tight internal spacing) */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
-            <Typography
-              sx={{
+                alignSelf: 'flex-end',
+                background: '#FFFFFF',
+                color: accent,
+                border: `1px solid ${accent}40`,
+                borderRadius: '999px',
+                px: FLUID.topicPx,
+                py: FLUID.topicPy,
+                fontSize: FLUID.topicFont,
                 fontWeight: 800,
-                color: '#0F172A',
-                lineHeight: 1.1,
-                fontSize: FLUID.titleFont,
-                letterSpacing: '-0.02em',
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                lineHeight: 1,
+                boxShadow: `0 1px 3px ${accent}20`,
+                flexShrink: 0,
               }}
             >
-              {title}
-            </Typography>
-            <Typography
+              {topic}
+            </Box>
+
+            {/* Icon plate */}
+            <Box
               sx={{
-                mt: 'clamp(1px, 0.4cqh, 4px)',
-                color: '#7A8A9E',
-                fontSize: FLUID.inspiredFont,
-                fontStyle: 'italic',
-                fontWeight: 500,
-                lineHeight: 1.2,
+                width: FLUID.iconPlate,
+                height: FLUID.iconPlate,
+                borderRadius: FLUID.iconRadius,
+                background: `linear-gradient(140deg, ${accent} 0%, ${accent}D0 100%)`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: `0 8px 22px ${accent}50, inset 0 -3px 8px rgba(0,0,0,0.12), inset 0 2px 4px rgba(255,255,255,0.25)`,
+                flexShrink: 0,
               }}
             >
-              inspired by {inspiredBy}
-            </Typography>
+              <Typography
+                sx={{
+                  fontSize: FLUID.iconFont,
+                  lineHeight: 1,
+                  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))',
+                }}
+              >
+                {icon}
+              </Typography>
+            </Box>
+
+            {/* Title group (title + inspired-by, tight internal spacing) */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
+              <Typography
+                sx={{
+                  fontWeight: 800,
+                  color: '#0F172A',
+                  lineHeight: 1.1,
+                  fontSize: FLUID.titleFont,
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                {title}
+              </Typography>
+              <Typography
+                sx={{
+                  mt: 'clamp(2px, 0.6cqh, 5px)',
+                  color: '#7A8A9E',
+                  fontSize: FLUID.inspiredFont,
+                  fontStyle: 'italic',
+                  fontWeight: 500,
+                  lineHeight: 1.2,
+                }}
+              >
+                inspired by {inspiredBy}
+              </Typography>
+            </Box>
           </Box>
 
-          {/* Description — flexes to fill remaining space; vertically centered */}
+          {/* Middle: description — sits equidistant from top and bottom groups */}
           <Typography
             component="div"
             sx={{
-              flex: 1,
-              minHeight: 0,
               alignSelf: 'stretch',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
               color: '#475569',
-              lineHeight: 1.4,
+              lineHeight: 1.45,
               fontSize: FLUID.descFont,
               fontWeight: 500,
               px: 'clamp(0px, 1.5cqh, 8px)',
+              flexShrink: 0,
             }}
           >
             {description}
           </Typography>
 
-          {/* What you'll learn */}
+          {/* Bottom group: learn + meta + CTA */}
           <Box
             sx={{
-              alignSelf: 'stretch',
-              background: `${accent}14`,
-              border: `1px solid ${accent}2E`,
-              borderRadius: 'clamp(8px, 1.8cqh, 12px)',
-              px: FLUID.learnPx,
-              py: FLUID.learnPy,
               display: 'flex',
-              alignItems: 'center',
-              gap: 'clamp(4px, 1cqh, 8px)',
-              textAlign: 'left',
+              flexDirection: 'column',
+              alignItems: 'stretch',
+              gap: FLUID.groupGap,
               flexShrink: 0,
             }}
           >
-            <Box sx={{ fontSize: 'clamp(0.78rem, 2.4cqh, 0.95rem)', lineHeight: 1, flexShrink: 0 }}>📚</Box>
-            <Typography
-              component="div"
+            {/* What you'll learn */}
+            <Box
               sx={{
-                color: '#1E293B',
-                fontSize: FLUID.learnFont,
-                fontWeight: 600,
-                lineHeight: 1.25,
-                minWidth: 0,
+                background: `${accent}14`,
+                border: `1px solid ${accent}2E`,
+                borderRadius: 'clamp(8px, 1.8cqh, 12px)',
+                px: FLUID.learnPx,
+                py: FLUID.learnPy,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'clamp(4px, 1cqh, 8px)',
+                textAlign: 'left',
               }}
             >
-              <Box component="span" sx={{ color: accent, fontWeight: 800 }}>Learn:</Box>{' '}
-              {learn}
-            </Typography>
-          </Box>
-
-          {/* Meta row */}
-          <Box
-            sx={{
-              alignSelf: 'stretch',
-              display: 'flex',
-              justifyContent: 'center',
-              gap: FLUID.metaGap,
-              fontSize: FLUID.metaFont,
-              color: '#64748B',
-              fontWeight: 600,
-              lineHeight: 1,
-              flexShrink: 0,
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 'clamp(2px, 0.6cqh, 5px)' }}>
-              <Box component="span" sx={{ fontSize: 'clamp(0.7rem, 2.1cqh, 0.85rem)' }}>⚡</Box>
-              {difficulty}
+              <Box sx={{ fontSize: 'clamp(0.78rem, 2.4cqh, 0.95rem)', lineHeight: 1, flexShrink: 0 }}>📚</Box>
+              <Typography
+                component="div"
+                sx={{
+                  color: '#1E293B',
+                  fontSize: FLUID.learnFont,
+                  fontWeight: 600,
+                  lineHeight: 1.3,
+                  minWidth: 0,
+                }}
+              >
+                <Box component="span" sx={{ color: accent, fontWeight: 800 }}>Learn:</Box>{' '}
+                {learn}
+              </Typography>
             </Box>
-            <Box sx={{ width: '1px', background: '#CBD5E1' }} />
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 'clamp(2px, 0.6cqh, 5px)' }}>
-              <Box component="span" sx={{ fontSize: 'clamp(0.7rem, 2.1cqh, 0.85rem)' }}>⏱</Box>
-              {playTime}
-            </Box>
-          </Box>
 
-          {/* Play CTA */}
-          <Box
-            sx={{
-              alignSelf: 'stretch',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 'clamp(4px, 1cqh, 8px)',
-              py: FLUID.ctaPy,
-              borderRadius: FLUID.ctaRadius,
-              background: available
-                ? `linear-gradient(135deg, ${accent} 0%, ${accent}E6 100%)`
-                : '#E0E0E0',
-              color: available ? '#FFFFFF' : '#9E9E9E',
-              fontWeight: 800,
-              fontSize: FLUID.ctaFont,
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
-              flexShrink: 0,
-              boxShadow: available
-                ? `0 5px 14px ${accent}50, inset 0 1px 0 rgba(255,255,255,0.25)`
-                : 'none',
-            }}
-          >
-            <Box component="span" sx={{ fontSize: '0.78em' }}>▶</Box>
-            {available ? 'Play Now' : 'Coming Soon'}
+            {/* Meta row */}
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: FLUID.metaGap,
+                fontSize: FLUID.metaFont,
+                color: '#64748B',
+                fontWeight: 600,
+                lineHeight: 1,
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 'clamp(2px, 0.6cqh, 5px)' }}>
+                <Box component="span" sx={{ fontSize: 'clamp(0.7rem, 2.1cqh, 0.85rem)' }}>⚡</Box>
+                {difficulty}
+              </Box>
+              <Box sx={{ width: '1px', background: '#CBD5E1' }} />
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 'clamp(2px, 0.6cqh, 5px)' }}>
+                <Box component="span" sx={{ fontSize: 'clamp(0.7rem, 2.1cqh, 0.85rem)' }}>⏱</Box>
+                {playTime}
+              </Box>
+            </Box>
+
+            {/* Play CTA */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 'clamp(4px, 1cqh, 8px)',
+                py: FLUID.ctaPy,
+                borderRadius: FLUID.ctaRadius,
+                background: available
+                  ? `linear-gradient(135deg, ${accent} 0%, ${accent}E6 100%)`
+                  : '#E0E0E0',
+                color: available ? '#FFFFFF' : '#9E9E9E',
+                fontWeight: 800,
+                fontSize: FLUID.ctaFont,
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+                boxShadow: available
+                  ? `0 5px 14px ${accent}50, inset 0 1px 0 rgba(255,255,255,0.25)`
+                  : 'none',
+              }}
+            >
+              <Box component="span" sx={{ fontSize: '0.78em' }}>▶</Box>
+              {available ? 'Play Now' : 'Coming Soon'}
+            </Box>
           </Box>
         </Box>
       </Box>
