@@ -12,11 +12,15 @@ interface BoardProps {
   maxSize?: number;
   /** Disable input (e.g. on game-over overlay). */
   disabled?: boolean;
+  /** When the board is being viewed rotated 180° (e.g. by the player on the
+   *  far side of a tabletop), invert both swipe axes so a swipe in their
+   *  perceived direction sends the right command to the engine. */
+  invertGestures?: boolean;
 }
 
 const GAP_PCT = 1.6; // percent gap on each side of a tile within its cell
 
-export default function Board({ state, track, onMove, maxSize, disabled }: BoardProps) {
+export default function Board({ state, track, onMove, maxSize, disabled, invertGestures }: BoardProps) {
   const touchStart = useRef<{ x: number; y: number } | null>(null);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -26,14 +30,15 @@ export default function Board({ state, track, onMove, maxSize, disabled }: Board
   const handleTouchEnd = useCallback(
     (e: React.TouchEvent) => {
       if (disabled || !onMove || !touchStart.current) return;
-      const dx = e.changedTouches[0].clientX - touchStart.current.x;
-      const dy = e.changedTouches[0].clientY - touchStart.current.y;
+      let dx = e.changedTouches[0].clientX - touchStart.current.x;
+      let dy = e.changedTouches[0].clientY - touchStart.current.y;
       touchStart.current = null;
       if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
+      if (invertGestures) { dx = -dx; dy = -dy; }
       if (Math.abs(dx) > Math.abs(dy)) onMove(dx > 0 ? 'right' : 'left');
       else onMove(dy > 0 ? 'down' : 'up');
     },
-    [onMove, disabled],
+    [onMove, disabled, invertGestures],
   );
 
   const cellPct = 100 / state.size;

@@ -43,9 +43,12 @@ interface PlayerColumnProps {
   target: Target;
   onMove: (dir: Direction) => void;
   winnerLabel?: string | null;
+  /** Render this column rotated 180° so a player on the far side of a
+   *  tabletop screen sees their own board right-side up. Inverts swipes too. */
+  flipped?: boolean;
 }
 
-function PlayerColumn({ label, controls, accent, slot, track, target, onMove, winnerLabel }: PlayerColumnProps) {
+function PlayerColumn({ label, controls, accent, slot, track, target, onMove, winnerLabel, flipped }: PlayerColumnProps) {
   const top = highestValue(slot.state);
   const palette = paletteFor(top || 2);
   const stage = stageFor(track, top || 2);
@@ -58,6 +61,8 @@ function PlayerColumn({ label, controls, accent, slot, track, target, onMove, wi
         flexDirection: 'column',
         alignItems: 'stretch',
         gap: 1.2,
+        transform: flipped ? 'rotate(180deg)' : undefined,
+        transformOrigin: 'center center',
       }}
     >
       <Box
@@ -112,6 +117,7 @@ function PlayerColumn({ label, controls, accent, slot, track, target, onMove, wi
           track={track}
           onMove={onMove}
           disabled={slot.stuck || !!winnerLabel}
+          invertGestures={flipped}
         />
 
         {(slot.reachedTarget || slot.stuck) && !winnerLabel && (
@@ -345,7 +351,7 @@ export default function ChallengePlay({ track, onChangeMode }: ChallengePlayProp
       >
         <PlayerColumn
           label="Player 1"
-          controls="W A S D"
+          controls="Swipe / W A S D"
           accent="#F59E0B"
           slot={p1}
           track={track}
@@ -391,13 +397,14 @@ export default function ChallengePlay({ track, onChangeMode }: ChallengePlayProp
 
         <PlayerColumn
           label="Player 2"
-          controls="↑ ↓ ← →"
+          controls="Swipe / ↑ ↓ ← →"
           accent="#0EA5E9"
           slot={p2}
           track={track}
           target={target}
           onMove={dir => moveFor('p2', dir)}
           winnerLabel={winnerLabel}
+          flipped
         />
 
         {/* Match-end overlay */}
