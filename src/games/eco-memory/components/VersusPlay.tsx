@@ -1,11 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GHG_PAIRS } from '../data';
+import {
+  getLayoutForDifficulty,
+  getPairsForDifficulty,
+  type Difficulty,
+} from '../data';
 import {
   canFlip,
   flipCard,
   resolveTurn,
+  revealAll,
   startGame,
   type GameState,
 } from '../engine';
@@ -17,6 +22,8 @@ import PlayerHUD from './PlayerHUD';
 import { audio } from '../audio';
 
 interface VersusPlayProps {
+  difficulty: Difficulty;
+  studyMode: boolean;
   onExit: () => void;
 }
 
@@ -35,9 +42,8 @@ interface PlayerStats {
 
 const REVEAL_MATCH_MS = 700;
 const REVEAL_MISS_MS = 1000;
-const BOARD_COLS = 4;
-const BOARD_ROWS = 4;
 const GAMEOVER_DELAY_MS = 1700;
+const STUDY_MS = 3500;
 const EMOJI_FONT = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
 
 const PLAYERS = [
@@ -45,8 +51,14 @@ const PLAYERS = [
   { id: 1 as const, label: 'Player 2', emoji: '🔵', accent: '#0EA5E9' },
 ];
 
-export default function VersusPlay({ onExit }: VersusPlayProps) {
-  const [game, setGame] = useState<GameState>(() => startGame());
+export default function VersusPlay({ difficulty, studyMode, onExit }: VersusPlayProps) {
+  const pairs = getPairsForDifficulty(difficulty);
+  const { cols: BOARD_COLS, rows: BOARD_ROWS } = getLayoutForDifficulty(difficulty);
+
+  const [game, setGame] = useState<GameState>(() => {
+    const fresh = startGame(pairs);
+    return studyMode ? revealAll(fresh, true) : fresh;
+  });
   const [current, setCurrent] = useState<0 | 1>(0);
   const [stats, setStats] = useState<[PlayerStats, PlayerStats]>([
     { matches: 0, score: 0 },
@@ -57,13 +69,24 @@ export default function VersusPlay({ onExit }: VersusPlayProps) {
   const [finished, setFinished] = useState(false);
   const [muted, setMuted] = useState(() => audio.isMuted());
   const [fact, setFact] = useState<string | null>(null);
+  const [studying, setStudying] = useState(studyMode);
 
-  const totalPairs = GHG_PAIRS.length;
+  const totalPairs = pairs.length;
   const factTimer = useRef<number | null>(null);
   const burstIdRef = useRef(0);
-  // Derived: input is locked while two cards are mid-reveal. Cheaper than
-  // storing it as state, and avoids `setLocked` inside the resolution effect.
-  const locked = game.flippedIds.length === 2;
+  // Derived: input is locked during the study reveal or while a flipped pair
+  // is being resolved.
+  const locked = studying || game.flippedIds.length === 2;
+
+  // Study mode: hold the reveal then flip the deck back face-down.
+  useEffect(() => {
+    if (!studying) return;
+    const timer = window.setTimeout(() => {
+      setGame(prev => revealAll(prev, false));
+      setStudying(false);
+    }, STUDY_MS);
+    return () => window.clearTimeout(timer);
+  }, [studying]);
 
   // Resolve a flipped pair, attribute score to the current player, and pass
   // the turn on a miss. Same shape as SoloPlay, but with per-player accounting.
@@ -120,7 +143,7 @@ export default function VersusPlay({ onExit }: VersusPlayProps) {
       });
     }, wait);
     return () => window.clearTimeout(timer);
-  }, [game.flippedIds, game.deck, totalPairs, current]);
+  }, [game.flippedIds, game.deck, totalPairs, current, BOARD_COLS, BOARD_ROWS]);
 
   useEffect(
     () => () => {
@@ -130,7 +153,9 @@ export default function VersusPlay({ onExit }: VersusPlayProps) {
   );
 
   const startNewGame = useCallback(() => {
-    setGame(startGame());
+    const fresh = startGame(pairs);
+    setGame(studyMode ? revealAll(fresh, true) : fresh);
+    setStudying(studyMode);
     setCurrent(0);
     setStats([
       { matches: 0, score: 0 },
@@ -140,7 +165,7 @@ export default function VersusPlay({ onExit }: VersusPlayProps) {
     setShowConfetti(false);
     setFinished(false);
     setFact(null);
-  }, []);
+  }, [pairs, studyMode]);
 
   const onFlip = useCallback(
     (id: number) => {
@@ -316,8 +341,27 @@ export default function VersusPlay({ onExit }: VersusPlayProps) {
           flipped
         />
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, flexShrink: 0, flexWrap: 'wrap' }}>
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <Box
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.4,
+                px: 1,
+                py: 0.3,
+                borderRadius: 999,
+                background: '#9B59B61F',
+                color: '#9B59B6',
+                fontSize: '0.7rem',
+                fontWeight: 800,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                fontFamily: EMOJI_FONT,
+              }}
+            >
+              {difficulty === 'easy' ? '🌱 Easy' : difficulty === 'hard' ? '🌳 Hard' : '🌿 Medium'}
+            </Box>
             <Typography sx={{ fontSize: 12, color: '#5A6A7E', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700 }}>
               Pairs left:
             </Typography>
@@ -372,6 +416,40 @@ export default function VersusPlay({ onExit }: VersusPlayProps) {
               />
             ))}
             {showConfetti && <Confetti onDone={() => setShowConfetti(false)} />}
+            <AnimatePresence>
+              {studying && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  style={{
+                    position: 'absolute',
+                    top: 8,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    zIndex: 35,
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      px: 2,
+                      py: 0.7,
+                      borderRadius: 999,
+                      background: '#0D9B4A',
+                      color: '#FFFFFF',
+                      fontSize: '0.78rem',
+                      fontWeight: 800,
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      boxShadow: '0 6px 18px rgba(13,155,74,0.35)',
+                    }}
+                  >
+                    📖 Memorise the board…
+                  </Box>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </Box>
         </Box>
 

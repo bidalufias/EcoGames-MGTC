@@ -1,12 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GHG_PAIRS } from '../data';
+import {
+  getLayoutForDifficulty,
+  getPairsForDifficulty,
+  type Difficulty,
+} from '../data';
 import {
   canFlip,
   flipCard,
   rating,
   resolveTurn,
+  revealAll,
   startGame,
   type GameState,
 } from '../engine';
@@ -29,20 +34,27 @@ interface Burst {
 }
 
 interface SoloPlayProps {
+  difficulty: Difficulty;
+  studyMode: boolean;
   onExit: () => void;
 }
 
-const BEST_KEY = 'eco-memory:best';
+const BEST_KEY = (d: Difficulty) => `eco-memory:best:${d}`;
 const REVEAL_MATCH_MS = 650;
 const REVEAL_MISS_MS = 950;
-const BOARD_COLS = 4;
-const BOARD_ROWS = 4;
 const GAMEOVER_DELAY_MS = 1700;
+const STUDY_MS = 3500;
 const EMOJI_FONT = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
 
-export default function SoloPlay({ onExit }: SoloPlayProps) {
+export default function SoloPlay({ difficulty, studyMode, onExit }: SoloPlayProps) {
+  const pairs = getPairsForDifficulty(difficulty);
+  const { cols: BOARD_COLS, rows: BOARD_ROWS } = getLayoutForDifficulty(difficulty);
+
   const [screen, setScreen] = useState<Screen>('playing');
-  const [game, setGame] = useState<GameState>(() => startGame());
+  const [game, setGame] = useState<GameState>(() => {
+    const fresh = startGame(pairs);
+    return studyMode ? revealAll(fresh, true) : fresh;
+  });
   const [scoreDelta, setScoreDelta] = useState<number | undefined>(undefined);
   const [fact, setFact] = useState<string | null>(null);
   const [best, setBest] = useState(0);
@@ -51,24 +63,38 @@ export default function SoloPlay({ onExit }: SoloPlayProps) {
   const [bursts, setBursts] = useState<Burst[]>([]);
   const [showConfetti, setShowConfetti] = useState(false);
   const [muted, setMuted] = useState(() => audio.isMuted());
+  const [studying, setStudying] = useState(studyMode);
 
-  const totalPairs = GHG_PAIRS.length;
+  const totalPairs = pairs.length;
   const factTimer = useRef<number | null>(null);
   const burstIdRef = useRef(0);
-  // Derived: input is locked while two cards are mid-reveal.
-  const locked = game.flippedIds.length === 2;
+  // Derived: input is locked while two cards are mid-reveal or study
+  // mode is still showing the deck.
+  const locked = studying || game.flippedIds.length === 2;
 
   useEffect(() => {
-    const raw = localStorage.getItem(BEST_KEY);
+    const raw = localStorage.getItem(BEST_KEY(difficulty));
     setBest(raw ? Number(raw) || 0 : 0);
-  }, []);
+  }, [difficulty]);
 
   useEffect(() => {
     if (game.score > best) {
       setBest(game.score);
-      localStorage.setItem(BEST_KEY, String(game.score));
+      localStorage.setItem(BEST_KEY(difficulty), String(game.score));
     }
-  }, [game.score, best]);
+  }, [game.score, best, difficulty]);
+
+  // Study mode: hold the reveal for STUDY_MS, then flip everything back and
+  // unlock input. The fresh state already starts with revealAll(true) when
+  // studyMode is on (see useState initialiser).
+  useEffect(() => {
+    if (!studying) return;
+    const timer = window.setTimeout(() => {
+      setGame(prev => revealAll(prev, false));
+      setStudying(false);
+    }, STUDY_MS);
+    return () => window.clearTimeout(timer);
+  }, [studying]);
 
   useEffect(() => {
     if (game.flippedIds.length !== 2) return;
@@ -115,7 +141,7 @@ export default function SoloPlay({ onExit }: SoloPlayProps) {
       });
     }, wait);
     return () => window.clearTimeout(timer);
-  }, [game.flippedIds, game.deck, totalPairs]);
+  }, [game.flippedIds, game.deck, totalPairs, BOARD_COLS, BOARD_ROWS]);
 
   useEffect(
     () => () => {
@@ -125,14 +151,16 @@ export default function SoloPlay({ onExit }: SoloPlayProps) {
   );
 
   const startNewGame = useCallback(() => {
-    setGame(startGame());
+    const fresh = startGame(pairs);
+    setGame(studyMode ? revealAll(fresh, true) : fresh);
+    setStudying(studyMode);
     setScoreDelta(undefined);
     setFact(null);
     setSubmitted(false);
     setBursts([]);
     setShowConfetti(false);
     setScreen('playing');
-  }, []);
+  }, [pairs, studyMode]);
 
   const onFlip = useCallback(
     (id: number) => {
@@ -347,13 +375,37 @@ export default function SoloPlay({ onExit }: SoloPlayProps) {
           onToggleMute={toggleMute}
         />
 
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, flexShrink: 0 }}>
-          <EcoButton size="small" onClick={startNewGame}>
-            New Game
-          </EcoButton>
-          <EcoButton size="small" variant="ghost" onClick={onExit}>
-            Change mode
-          </EcoButton>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, flexShrink: 0, flexWrap: 'wrap' }}>
+          <Box
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 0.6,
+              px: 1,
+              py: 0.3,
+              borderRadius: 999,
+              background: '#9B59B61F',
+              color: '#9B59B6',
+              fontSize: '0.72rem',
+              fontWeight: 800,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              fontFamily: EMOJI_FONT,
+            }}
+          >
+            {difficulty === 'easy' ? '🌱 Easy' : difficulty === 'hard' ? '🌳 Hard' : '🌿 Medium'}
+            <Box component="span" sx={{ opacity: 0.7, ml: 0.4, letterSpacing: 0 }}>
+              {totalPairs} pairs
+            </Box>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <EcoButton size="small" onClick={startNewGame}>
+              New Game
+            </EcoButton>
+            <EcoButton size="small" variant="ghost" onClick={onExit}>
+              Change mode
+            </EcoButton>
+          </Box>
         </Box>
 
         <Box sx={{ flex: 1, minHeight: 0, minWidth: 0, display: 'grid', placeItems: 'center' }}>
@@ -376,6 +428,40 @@ export default function SoloPlay({ onExit }: SoloPlayProps) {
               />
             ))}
             {showConfetti && <Confetti onDone={() => setShowConfetti(false)} />}
+            <AnimatePresence>
+              {studying && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  style={{
+                    position: 'absolute',
+                    top: 8,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    zIndex: 35,
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      px: 2,
+                      py: 0.7,
+                      borderRadius: 999,
+                      background: '#0D9B4A',
+                      color: '#FFFFFF',
+                      fontSize: '0.78rem',
+                      fontWeight: 800,
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      boxShadow: '0 6px 18px rgba(13,155,74,0.35)',
+                    }}
+                  >
+                    📖 Memorise the board…
+                  </Box>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </Box>
         </Box>
       </Box>

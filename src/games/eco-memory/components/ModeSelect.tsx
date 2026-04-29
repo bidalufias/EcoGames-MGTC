@@ -1,12 +1,18 @@
+import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { motion } from 'framer-motion';
 import EcoButton from '../../../components/EcoButton';
-import { GHG_PAIRS } from '../data';
+import { DIFFICULTIES, GHG_PAIRS, type Difficulty } from '../data';
 
 export type Mode = 'solo' | 'versus';
 
+export interface GameSettings {
+  difficulty: Difficulty;
+  studyMode: boolean;
+}
+
 interface ModeSelectProps {
-  onPick: (mode: Mode) => void;
+  onPick: (mode: Mode, settings: GameSettings) => void;
 }
 
 interface ModeCardProps {
@@ -19,6 +25,35 @@ interface ModeCardProps {
 }
 
 const EMOJI_FONT = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+const SETTINGS_KEY = 'eco-memory:settings';
+
+interface PersistedSettings {
+  difficulty: Difficulty;
+  studyMode: boolean;
+}
+
+function loadSettings(): PersistedSettings {
+  if (typeof window === 'undefined') return { difficulty: 'medium', studyMode: false };
+  try {
+    const raw = window.localStorage.getItem(SETTINGS_KEY);
+    if (!raw) return { difficulty: 'medium', studyMode: false };
+    const parsed = JSON.parse(raw) as Partial<PersistedSettings>;
+    const difficulty: Difficulty =
+      parsed.difficulty === 'easy' || parsed.difficulty === 'hard' ? parsed.difficulty : 'medium';
+    return { difficulty, studyMode: !!parsed.studyMode };
+  } catch {
+    return { difficulty: 'medium', studyMode: false };
+  }
+}
+
+function saveSettings(s: PersistedSettings) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+  } catch {
+    // localStorage full or disabled — ignore.
+  }
+}
 
 function ModeCard({ title, tagline, emoji, accent, bullets, onPick }: ModeCardProps) {
   return (
@@ -90,7 +125,76 @@ function ModeCard({ title, tagline, emoji, accent, bullets, onPick }: ModeCardPr
   );
 }
 
+interface DifficultyPillProps {
+  difficulty: Difficulty;
+  selected: boolean;
+  onSelect: () => void;
+}
+
+function DifficultyPill({ difficulty, selected, onSelect }: DifficultyPillProps) {
+  const def = DIFFICULTIES[difficulty];
+  return (
+    <Box
+      component="button"
+      onClick={onSelect}
+      aria-pressed={selected}
+      sx={{
+        flex: 1,
+        minWidth: 110,
+        cursor: 'pointer',
+        background: selected ? '#9B59B6' : '#FFFFFF',
+        color: selected ? '#FFFFFF' : '#1A2332',
+        border: `2px solid ${selected ? '#9B59B6' : '#E1E6ED'}`,
+        borderRadius: 2,
+        px: 1.5,
+        py: 1,
+        textAlign: 'left',
+        transition: 'background 0.15s, border-color 0.15s, color 0.15s',
+        '&:hover': !selected ? { borderColor: '#9B59B6AA' } : {},
+        '&:focus-visible': {
+          outline: '2px solid #9B59B6',
+          outlineOffset: 2,
+        },
+      }}
+    >
+      <Typography
+        sx={{
+          fontSize: '0.95rem',
+          fontWeight: 800,
+          fontFamily: EMOJI_FONT,
+          lineHeight: 1.1,
+          mb: 0.2,
+        }}
+      >
+        {def.emoji} {def.label}
+      </Typography>
+      <Typography
+        sx={{
+          fontSize: '0.7rem',
+          letterSpacing: '0.06em',
+          opacity: 0.8,
+          textTransform: 'uppercase',
+          fontWeight: 700,
+        }}
+      >
+        {def.description}
+      </Typography>
+    </Box>
+  );
+}
+
 export default function ModeSelect({ onPick }: ModeSelectProps) {
+  const initial = loadSettings();
+  const [difficulty, setDifficulty] = useState<Difficulty>(initial.difficulty);
+  const [studyMode, setStudyMode] = useState<boolean>(initial.studyMode);
+
+  const handlePick = (mode: Mode) => {
+    saveSettings({ difficulty, studyMode });
+    onPick(mode, { difficulty, studyMode });
+  };
+
+  const visiblePairs = GHG_PAIRS.slice(0, DIFFICULTIES[difficulty].pairCount);
+
   return (
     <Box
       sx={{
@@ -121,9 +225,80 @@ export default function ModeSelect({ onPick }: ModeSelectProps) {
           🧠 Eco Memory
         </Typography>
         <Typography sx={{ color: '#5A6A7E', mt: 1, maxWidth: 540, textAlign: 'center' }}>
-          Match greenhouse gases to their sources. Pick a mode to start.
+          Match greenhouse gases to their sources. Pick a difficulty and a mode to start.
         </Typography>
       </motion.div>
+
+      {/* Difficulty + study mode row */}
+      <Box sx={{ width: '100%', maxWidth: 820, display: 'flex', flexDirection: 'column', gap: 1.2 }}>
+        <Typography
+          sx={{ fontSize: '0.7rem', letterSpacing: '0.12em', fontWeight: 800, color: '#5A6A7E', textTransform: 'uppercase' }}
+        >
+          Difficulty
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          {(['easy', 'medium', 'hard'] as const).map(d => (
+            <DifficultyPill
+              key={d}
+              difficulty={d}
+              selected={difficulty === d}
+              onSelect={() => setDifficulty(d)}
+            />
+          ))}
+        </Box>
+
+        <Box
+          component="button"
+          onClick={() => setStudyMode(s => !s)}
+          aria-pressed={studyMode}
+          sx={{
+            mt: 1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.2,
+            background: studyMode ? '#0D9B4A12' : '#FFFFFF',
+            border: `2px solid ${studyMode ? '#0D9B4A' : '#E1E6ED'}`,
+            borderRadius: 2,
+            px: 1.5,
+            py: 1,
+            cursor: 'pointer',
+            textAlign: 'left',
+            transition: 'background 0.15s, border-color 0.15s',
+            '&:hover': !studyMode ? { borderColor: '#0D9B4AAA' } : {},
+            '&:focus-visible': {
+              outline: '2px solid #0D9B4A',
+              outlineOffset: 2,
+            },
+          }}
+        >
+          <Box
+            sx={{
+              width: 22,
+              height: 22,
+              borderRadius: '6px',
+              background: studyMode ? '#0D9B4A' : '#FFFFFF',
+              border: `2px solid ${studyMode ? '#0D9B4A' : '#C8D0DA'}`,
+              color: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '0.85rem',
+              fontWeight: 900,
+              flexShrink: 0,
+            }}
+          >
+            {studyMode ? '✓' : ''}
+          </Box>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography sx={{ fontSize: '0.95rem', fontWeight: 800, color: '#1A2332', lineHeight: 1.15 }}>
+              📖 Study mode
+            </Typography>
+            <Typography sx={{ fontSize: '0.78rem', color: '#5A6A7E', lineHeight: 1.3 }}>
+              Reveal every card for a few seconds before play starts.
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
 
       <Box
         sx={{
@@ -145,7 +320,7 @@ export default function ModeSelect({ onPick }: ModeSelectProps) {
             'Streak bonuses for consecutive matches',
             'Submit your score to the global leaderboard',
           ]}
-          onPick={() => onPick('solo')}
+          onPick={() => handlePick('solo')}
         />
         <ModeCard
           title="Versus"
@@ -157,18 +332,17 @@ export default function ModeSelect({ onPick }: ModeSelectProps) {
             'Match → keep your turn · Miss → opponent goes',
             'Most pairs at the end wins',
           ]}
-          onPick={() => onPick('versus')}
+          onPick={() => handlePick('versus')}
         />
       </Box>
 
-      {/* Educational pair list — kept visible so first-time players see what
-          they're matching before they pick a mode. */}
+      {/* Pairs preview reflects the current difficulty */}
       <Box sx={{ maxWidth: 820, width: '100%' }}>
         <Typography sx={{ color: '#5A6A7E', mb: 1, textAlign: 'center', fontSize: 13 }}>
-          Pairs you'll match:
+          Pairs you'll match ({visiblePairs.length}):
         </Typography>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
-          {GHG_PAIRS.map(p => (
+          {visiblePairs.map(p => (
             <Box
               key={p.label}
               sx={{
