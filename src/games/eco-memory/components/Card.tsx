@@ -1,6 +1,7 @@
 import { Box } from '@mui/material';
 import { motion } from 'framer-motion';
 import type { CardDef, CardState } from '../engine';
+import { ACCENT, EMOJI_FONT, PAPER } from '../theme';
 
 interface CardProps {
   def: CardDef;
@@ -9,16 +10,14 @@ interface CardProps {
   disabled?: boolean;
 }
 
-// Emoji stack matches the Climate 2048 fix in 638e36f — on iOS Safari, relying
-// on Inter to fall back to the system emoji font occasionally leaves the glyph
-// unrendered (especially with CSS filters). Listing the colour-emoji fonts
-// first guarantees a glyph.
-const EMOJI_FONT = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
-
 /**
  * A flip-style memory card. The back and face are stacked in a 3D scene; the
  * inner wrapper rotates 180° on flip. We use container queries so the type
  * scales with the card's own width, not the viewport.
+ *
+ * Visual register: warm cream paper (matches the landing page), pair-coloured
+ * accent on the front. The back uses the game's violet accent so the deck
+ * still reads as one set even when half the cards are face-up.
  */
 export default function Card({ def, state, onClick, disabled }: CardProps) {
   const { flipped, matched } = state;
@@ -46,8 +45,9 @@ export default function Card({ def, state, onClick, disabled }: CardProps) {
         perspective: '1000px',
         containerType: 'inline-size',
         outline: 'none',
+        WebkitTapHighlightColor: 'transparent',
         '&:focus-visible > div': {
-          boxShadow: '0 0 0 3px rgba(155, 89, 182, 0.45)',
+          boxShadow: `0 0 0 3px ${ACCENT}66`,
           borderRadius: 8,
         },
       }}
@@ -78,35 +78,44 @@ export default function Card({ def, state, onClick, disabled }: CardProps) {
           sx={{
             position: 'absolute',
             inset: 0,
-            borderRadius: 2,
+            borderRadius: 'clamp(6px, 6cqi, 14px)',
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
-            background: 'linear-gradient(135deg, #FFFFFF 0%, #F0F3F7 100%)',
-            border: '2px solid #D0D7E0',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+            background: PAPER.surface,
+            border: `1px solid ${PAPER.hairline}`,
+            boxShadow: '0 1px 2px rgba(31,27,20,0.06), 0 4px 10px rgba(31,27,20,0.04)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             overflow: 'hidden',
           }}
         >
-          {/* Decorative pattern: tilted "?" with a soft brand gradient ring */}
+          {/* Soft accent wash on a portion of the back, like a watermark */}
           <Box
             sx={{
               position: 'absolute',
-              inset: '12%',
-              borderRadius: '50%',
-              background: 'radial-gradient(circle at 30% 30%, rgba(155, 89, 182, 0.10), transparent 65%)',
+              inset: 0,
+              background: `radial-gradient(circle at 30% 30%, ${ACCENT}14, transparent 65%)`,
+            }}
+          />
+          {/* Faint hairline frame */}
+          <Box
+            sx={{
+              position: 'absolute',
+              inset: 'clamp(4px, 6cqi, 9px)',
+              borderRadius: 'clamp(4px, 4cqi, 10px)',
+              border: `1px dashed ${ACCENT}33`,
             }}
           />
           <Box
             sx={{
-              fontSize: 'clamp(1.4rem, 18cqi, 3rem)',
+              fontSize: 'clamp(1.3rem, 22cqi, 3rem)',
               fontWeight: 900,
-              color: '#9B59B6',
+              color: ACCENT,
               opacity: 0.55,
               fontFamily: EMOJI_FONT,
-              transform: 'rotate(-8deg)',
+              transform: 'rotate(-6deg)',
+              letterSpacing: '-0.04em',
             }}
           >
             ?
@@ -118,15 +127,15 @@ export default function Card({ def, state, onClick, disabled }: CardProps) {
           sx={{
             position: 'absolute',
             inset: 0,
-            borderRadius: 2,
+            borderRadius: 'clamp(6px, 6cqi, 14px)',
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
             transform: 'rotateY(180deg)',
-            background: matched ? `${def.color}12` : '#FFFFFF',
-            border: `2px solid ${def.color}`,
+            background: matched ? `${def.color}10` : PAPER.surface,
+            border: `1.5px solid ${def.color}`,
             boxShadow: matched
-              ? `0 0 0 1px ${def.color}30 inset, 0 2px 10px ${def.color}20`
-              : `0 2px 10px ${def.color}25`,
+              ? `0 0 0 1px ${def.color}30 inset, 0 1px 2px rgba(31,27,20,0.04)`
+              : `0 2px 10px ${def.color}28, 0 1px 2px rgba(31,27,20,0.04)`,
             opacity: matched ? 0.78 : 1,
             display: 'flex',
             flexDirection: 'column',
@@ -139,9 +148,10 @@ export default function Card({ def, state, onClick, disabled }: CardProps) {
         >
           <Box
             sx={{
-              fontSize: 'clamp(1.4rem, 28cqi, 3rem)',
+              fontSize: 'clamp(1.4rem, 30cqi, 3.2rem)',
               lineHeight: 1,
               fontFamily: EMOJI_FONT,
+              filter: `drop-shadow(0 2px 4px ${def.color}40)`,
             }}
           >
             {def.emoji}
@@ -149,7 +159,7 @@ export default function Card({ def, state, onClick, disabled }: CardProps) {
           <Box
             sx={{
               mt: '6%',
-              fontSize: 'clamp(0.55rem, 8cqi, 0.85rem)',
+              fontSize: 'clamp(0.55rem, 9cqi, 0.9rem)',
               fontWeight: 800,
               color: def.color,
               textAlign: 'center',
