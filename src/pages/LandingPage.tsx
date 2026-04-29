@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { motion } from 'framer-motion';
-import GameTile, { type TileTemplate } from '../components/GameTile';
+import GameTile from '../components/GameTile';
 import EcoHeader from '../components/EcoHeader';
 
 interface GameDef {
@@ -15,11 +15,8 @@ interface GameDef {
   icon: string;
   accent: string;
   available: boolean;
-  template: TileTemplate;
 }
 
-// Grid order: A, B, C, B, C, A. The pattern places the two same-template
-// tiles diagonally so no two adjacent cells share a template.
 const games: GameDef[] = [
   {
     id: 'climate-ninja',
@@ -27,13 +24,25 @@ const games: GameDef[] = [
     inspiredBy: 'Fruit Ninja',
     topic: 'Greenhouse Gases',
     description: 'Slice through the seven greenhouse gases warming our planet.',
-    learn: 'Tell apart CO₂, methane, and the other gases driving climate change',
+    learn: 'CO₂, methane, and the other gases driving climate change',
     difficulty: 'Easy',
     playTime: '3 min',
     icon: '🥷',
-    accent: '#16A34A',
+    accent: '#15803D',
     available: true,
-    template: 'headline',
+  },
+  {
+    id: 'carbon-crush',
+    title: 'Carbon Crush',
+    inspiredBy: 'Candy Crush',
+    topic: 'Clean Energy',
+    description: 'Match polluting tech to phase it out for clean alternatives.',
+    learn: 'How renewables like solar and wind replace fossil fuels',
+    difficulty: 'Medium',
+    playTime: '5 min',
+    icon: '💎',
+    accent: '#1D4ED8',
+    available: true,
   },
   {
     id: 'recycle-rush',
@@ -41,18 +50,17 @@ const games: GameDef[] = [
     inspiredBy: 'Diner Dash',
     topic: 'Waste & Recycling',
     description: 'Sort the bins before customers walk away.',
-    learn: 'Where recyclables, compost, hazardous, and e-waste actually belong',
+    learn: 'Where recyclables, compost, hazardous, and e-waste belong',
     difficulty: 'Easy',
     playTime: '4 min',
     icon: '♻️',
     accent: '#C2410C',
     available: true,
-    template: 'index',
   },
   {
     id: 'eco-memory',
     title: 'Eco Memory',
-    inspiredBy: 'Memory Match',
+    inspiredBy: 'Memory',
     topic: 'Climate Knowledge',
     description: 'Pair greenhouse gases with their real-world sources.',
     learn: 'Where each greenhouse gas comes from in everyday life',
@@ -61,7 +69,6 @@ const games: GameDef[] = [
     icon: '🧠',
     accent: '#6D28D9',
     available: true,
-    template: 'object',
   },
   {
     id: 'green-defence',
@@ -75,7 +82,6 @@ const games: GameDef[] = [
     icon: '🛡️',
     accent: '#0F766E',
     available: true,
-    template: 'index',
   },
   {
     id: 'climate-2048',
@@ -86,29 +92,12 @@ const games: GameDef[] = [
     learn: 'How a clean technology scales from wafer to grid-connected farm',
     difficulty: 'Hard',
     playTime: '5 min',
-    icon: '🔢',
+    icon: '🧩',
     accent: '#B91C1C',
     available: true,
-    template: 'object',
-  },
-  {
-    id: 'carbon-crush',
-    title: 'Carbon Crush',
-    inspiredBy: 'Candy Crush',
-    topic: 'Clean Energy',
-    description: 'Match polluting tech to phase it out for clean alternatives.',
-    learn: 'How renewables like solar and wind are replacing fossil fuels',
-    difficulty: 'Medium',
-    playTime: '5 min',
-    icon: '💎',
-    accent: '#1D4ED8',
-    available: true,
-    template: 'headline',
   },
 ];
 
-// Inline grain SVG: a deterministic noise pattern, ~1 kB. Adds the paper
-// feel without shipping a separate asset request.
 const PAPER_GRAIN =
   "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.13  0 0 0 0 0.10  0 0 0 0 0.06  0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")";
 
@@ -158,7 +147,7 @@ export default function LandingPage() {
       </Box>
 
       <Box component="header" sx={{ position: 'relative', zIndex: 2, flexShrink: 0 }}>
-        <EcoHeader tagline="" />
+        <EcoHeader tagline="Six classic games, one climate mission." />
       </Box>
 
       {/* Hero */}
@@ -171,7 +160,7 @@ export default function LandingPage() {
           flexShrink: 0,
           textAlign: 'center',
           px: 3,
-          pt: 'clamp(10px, 2.4cqh, 28px)',
+          pt: 'clamp(10px, 2.6cqh, 30px)',
           pb: 'clamp(4px, 1cqh, 14px)',
         }}
       >
@@ -185,7 +174,7 @@ export default function LandingPage() {
             component="h1"
             sx={{
               m: 0,
-              fontSize: 'clamp(1.4rem, 4.2cqh, 2.8rem)',
+              fontSize: 'clamp(1.4rem, 4.4cqh, 2.9rem)',
               fontWeight: 900,
               lineHeight: 0.98,
               letterSpacing: '-0.04em',
@@ -205,11 +194,10 @@ export default function LandingPage() {
         >
           <Typography
             sx={{
-              mt: 'clamp(4px, 0.8cqh, 10px)',
+              mt: 'clamp(4px, 0.9cqh, 10px)',
               color: '#5B5247',
-              fontSize: 'clamp(0.72rem, 1.5cqh, 0.98rem)',
+              fontSize: 'clamp(0.74rem, 1.55cqh, 1rem)',
               fontWeight: 500,
-              letterSpacing: '0.005em',
               maxWidth: 640,
               mx: 'auto',
             }}
@@ -248,7 +236,7 @@ export default function LandingPage() {
           }}
         >
           {games.map((game, i) => (
-            <GameTile key={game.id} {...game} number={i + 1} index={i} />
+            <GameTile key={game.id} {...game} index={i} />
           ))}
         </Box>
       </Box>
@@ -259,11 +247,15 @@ export default function LandingPage() {
         sx={{
           position: 'relative',
           zIndex: 1,
-          textAlign: 'center',
-          py: 1,
           flexShrink: 0,
           borderTop: '1px solid #E8DFCB',
           background: 'rgba(250, 247, 240, 0.85)',
+          py: 'clamp(6px, 1.2cqh, 12px)',
+          px: 'clamp(16px, 3cqw, 36px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 2,
         }}
       >
         <Typography
@@ -275,6 +267,17 @@ export default function LandingPage() {
           }}
         >
           MGTC · Empowering climate education through play
+        </Typography>
+        <Typography
+          sx={{
+            color: '#9C8E78',
+            fontSize: '0.7rem',
+            fontWeight: 500,
+            letterSpacing: '0.02em',
+            display: { xs: 'none', sm: 'block' },
+          }}
+        >
+          {games.length} games · WCAG AA · Touch, mouse and keyboard
         </Typography>
       </Box>
     </Box>
