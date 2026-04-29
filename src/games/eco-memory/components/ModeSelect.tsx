@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { motion } from 'framer-motion';
-import { DIFFICULTIES, GHG_PAIRS, type Difficulty } from '../data';
+import { DIFFICULTIES, CLIMATE_PAIRS, type Difficulty } from '../data';
 import { ACCENT, ACCENT_RING, EMOJI_FONT, PAPER, PAPER_GRAIN } from '../theme';
 
 export type Mode = 'solo' | 'versus';
@@ -299,7 +299,7 @@ export default function ModeSelect({ onPick }: ModeSelectProps) {
     onPick(mode, { difficulty, studyMode });
   };
 
-  const visiblePairs = GHG_PAIRS.slice(0, DIFFICULTIES[difficulty].pairCount);
+  const visiblePairs = CLIMATE_PAIRS.slice(0, DIFFICULTIES[difficulty].pairCount);
 
   return (
     <Box
@@ -367,7 +367,7 @@ export default function ModeSelect({ onPick }: ModeSelectProps) {
               lineHeight: 1.35,
             }}
           >
-            Match each greenhouse gas to its real-world source, and unlock a fact for every pair.
+            Match each climate concept to its real-world example, and unlock a plain-English explanation with every pair.
           </Typography>
         </motion.div>
       </Box>
