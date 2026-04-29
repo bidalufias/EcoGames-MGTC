@@ -2,12 +2,12 @@
 // Climate 2048 split (engine.ts vs components/) so the React layer only deals
 // with input + animation, never with deck shuffling or match arithmetic.
 
-import { GHG_PAIRS, type PairDef } from './data';
+import { CLIMATE_PAIRS, type PairDef } from './data';
 
 export interface CardDef {
   /** Stable id for the lifetime of a single game (used as React key). */
   id: number;
-  /** Index into GHG_PAIRS — the two cards of a match share a pairId. */
+  /** Index into CLIMATE_PAIRS — the two cards of a match share a pairId. */
   pairId: number;
   /** Which side of the pair this card represents. */
   side: 'gas' | 'source';
@@ -64,7 +64,7 @@ function shuffle<T>(arr: T[], rand: () => number = Math.random): T[] {
 }
 
 /** Build a fresh deck from a list of pair definitions. */
-export function buildDeck(pairs: PairDef[] = GHG_PAIRS): CardDef[] {
+export function buildDeck(pairs: PairDef[] = CLIMATE_PAIRS): CardDef[] {
   const deck: CardDef[] = [];
   let id = 0;
   pairs.forEach((p, pairId) => {
@@ -90,7 +90,7 @@ export function buildDeck(pairs: PairDef[] = GHG_PAIRS): CardDef[] {
   return shuffle(deck);
 }
 
-export function startGame(pairs: PairDef[] = GHG_PAIRS): GameState {
+export function startGame(pairs: PairDef[] = CLIMATE_PAIRS): GameState {
   const deck = buildDeck(pairs);
   const cards: Record<number, CardState> = {};
   for (const c of deck) cards[c.id] = { flipped: false, matched: false };

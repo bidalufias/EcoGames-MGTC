@@ -186,7 +186,7 @@ export default function HUD({
             textOverflow: 'ellipsis',
           }}
         >
-          {totalPairs} pairs · greenhouse gases
+          {totalPairs} pairs · climate vocabulary
         </Typography>
       </Box>
       <Box

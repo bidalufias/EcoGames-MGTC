@@ -1,29 +1,131 @@
-// Eco Memory — pair definitions. Each pair links a greenhouse gas to its
-// real-world source so a successful match teaches a cause→effect mapping.
+// Eco Memory — climate-vocabulary pair definitions. Each pair links a key
+// climate concept to its real-world example so a successful match teaches a
+// term a player needs to read or talk about climate change.
+//
+// Greenhouse gases are intentionally NOT covered here — that's Climate Ninja's
+// territory. Eco Memory broadens to vocabulary, mechanisms, and named events
+// (Paris Agreement, IPCC) so the two games stay distinct.
 
 export interface PairDef {
+  /** Concept-side glyph and label (the term being defined). */
   emoji: string;
   label: string;
+  /** Example-side glyph and label (the real-world manifestation). */
   sourceEmoji: string;
   source: string;
   color: string;
+  /**
+   * 2–3 sentence first-time-reader explanation. Shown in the in-game fact
+   * ribbon, the end-of-game journal, and the ModeSelect glossary preview, so
+   * everywhere it appears it has to stand on its own.
+   */
   fact: string;
 }
 
-export const GHG_PAIRS: PairDef[] = [
-  { emoji: '⬛', label: 'CO₂',          sourceEmoji: '🏭', source: 'Fossil Fuels',  color: '#555',     fact: 'CO₂ makes up 76% of all GHG emissions.' },
-  { emoji: '🐄', label: 'CH₄',          sourceEmoji: '🌾', source: 'Agriculture',   color: '#8B4513', fact: 'Methane is 80× more potent than CO₂ over 20 years.' },
-  { emoji: '🧪', label: 'N₂O',          sourceEmoji: '🧬', source: 'Fertilizers',   color: '#9B59B6', fact: 'N₂O has 265× the warming potential of CO₂.' },
-  { emoji: '❄️', label: 'HFCs',         sourceEmoji: '🧊', source: 'Refrigerants',  color: '#3498DB', fact: 'Some HFCs are thousands of times more potent than CO₂.' },
-  { emoji: '💻', label: 'PFCs',         sourceEmoji: '🔧', source: 'Electronics',   color: '#2C3E50', fact: 'PFCs can last 50,000 years in the atmosphere.' },
-  { emoji: '⚡', label: 'SF₆',          sourceEmoji: '🔌', source: 'Power Grid',    color: '#F39C12', fact: 'SF₆ is 23,500× more warming than CO₂.' },
-  { emoji: '🖥️', label: 'NF₃',         sourceEmoji: '📺', source: 'Displays',      color: '#1ABC9C', fact: 'NF₃ is used in making the screens you read this on.' },
-  { emoji: '🌍', label: 'Net Zero',     sourceEmoji: '🌱', source: 'All Solutions', color: '#0D9B4A', fact: 'We need to reach Net Zero by 2050 to limit warming.' },
-  // Hard-mode extensions — short-lived climate forcers and abundant gases.
-  { emoji: '🖤', label: 'Black Carbon', sourceEmoji: '🚛', source: 'Diesel Engines', color: '#1F1F1F', fact: 'Black carbon (soot) absorbs sunlight; cutting it gives near-term climate gains.' },
-  { emoji: '🧴', label: 'CFCs',         sourceEmoji: '💨', source: 'Aerosol Sprays', color: '#7F8C8D', fact: 'CFCs were banned by the Montreal Protocol in 1987 to heal the ozone layer.' },
-  { emoji: '💧', label: 'H₂O Vapour',   sourceEmoji: '🌊', source: 'Evaporation',   color: '#2980B9', fact: 'Water vapour is the most abundant GHG and amplifies CO₂ warming.' },
-  { emoji: '🌫️', label: 'O₃',          sourceEmoji: '🌆', source: 'Smog',          color: '#E67E22', fact: 'Ground-level ozone is a short-lived but powerful greenhouse gas.' },
+// Order is important — easy/medium/hard slice from the front, so the most
+// foundational concepts come first.
+export const CLIMATE_PAIRS: PairDef[] = [
+  // —— Easy (foundational actions + state) ——
+  {
+    emoji: '🪣',
+    label: 'Carbon sink',
+    sourceEmoji: '🌲',
+    source: 'Forest',
+    color: '#15803D',
+    fact: 'A natural store that absorbs more CO₂ than it releases. Forests, oceans, and healthy soils hold trillions of tonnes of carbon. When forests burn or are cleared, that stored carbon returns to the atmosphere.',
+  },
+  {
+    emoji: '⚖️',
+    label: 'Net zero',
+    sourceEmoji: '🟰',
+    source: 'Balance',
+    color: '#0D9B4A',
+    fact: 'Adding no more greenhouse gases than we remove. Some emissions still happen, but trees, soils, and carbon-capture machines pull out an equal amount. The atmosphere’s balance stays steady.',
+  },
+  {
+    emoji: '✂️',
+    label: 'Mitigation',
+    sourceEmoji: '💨',
+    source: 'Renewables',
+    color: '#84CC16',
+    fact: 'Cutting the cause of climate change — burning less coal, gas, and oil and replacing them with clean power like wind and solar. The opposite of waiting for the damage to arrive.',
+  },
+  {
+    emoji: '🛡️',
+    label: 'Adaptation',
+    sourceEmoji: '🧱',
+    source: 'Sea wall',
+    color: '#2563EB',
+    fact: 'Preparing for the climate change that is already locked in — building sea walls, redesigning farms, cooling cities. Mitigation reduces the cause; adaptation reduces the harm.',
+  },
+
+  // —— Medium adds (personal + science vocab) ——
+  {
+    emoji: '👣',
+    label: 'Carbon footprint',
+    sourceEmoji: '🚗',
+    source: 'Daily life',
+    color: '#71717A',
+    fact: 'The total greenhouse gases your daily life adds to the atmosphere through travel, food, energy, and shopping. The bigger the footprint, the heavier the load you place on the climate.',
+  },
+  {
+    emoji: '👤',
+    label: 'Anthropogenic',
+    sourceEmoji: '🏭',
+    source: 'Human-caused',
+    color: '#B91C1C',
+    fact: 'Caused by humans. Almost all of the warming since 1900 is anthropogenic — the result of burning fossil fuels and clearing land — not the slow natural cycles that shaped earlier eras.',
+  },
+  {
+    emoji: '🪞',
+    label: 'Albedo',
+    sourceEmoji: '❄️',
+    source: 'Ice & snow',
+    color: '#0EA5E9',
+    fact: 'How much sunlight a surface bounces back into space. Bright snow and ice reflect most of it; dark ocean and rock absorb nearly all. As ice melts, the planet swaps its mirror for a sponge.',
+  },
+  {
+    emoji: '🎢',
+    label: 'Tipping point',
+    sourceEmoji: '🧊',
+    source: 'Arctic melt',
+    color: '#EA580C',
+    fact: 'A threshold beyond which a change becomes self-sustaining and almost impossible to undo. Once enough Arctic summer ice is gone, the dark water absorbs more heat — melting more ice — and the system can’t go back.',
+  },
+
+  // —— Hard adds (chains + named institutions + named impacts) ——
+  {
+    emoji: '🔁',
+    label: 'Feedback loop',
+    sourceEmoji: '🌋',
+    source: 'Permafrost',
+    color: '#D97706',
+    fact: 'When a change makes more of itself happen. Warming thaws Arctic permafrost, which releases trapped methane, which warms things further — the loop closes back on its own cause.',
+  },
+  {
+    emoji: '🤝',
+    label: 'Paris Agreement',
+    sourceEmoji: '🌡️',
+    source: '1.5 °C cap',
+    color: '#7C3AED',
+    fact: 'The 2015 treaty in which almost every country agreed to keep global warming well below 2 °C — and aim for under 1.5 °C — above pre-industrial levels. Each nation sets its own pledge to get there.',
+  },
+  {
+    emoji: '📚',
+    label: 'IPCC',
+    sourceEmoji: '🔬',
+    source: 'Climate reports',
+    color: '#1E293B',
+    fact: 'The UN’s Intergovernmental Panel on Climate Change. Thousands of scientists review the world’s climate research and publish reports that say what we know — and how confident we are about it.',
+  },
+  {
+    emoji: '🧪',
+    label: 'Acidification',
+    sourceEmoji: '🪸',
+    source: 'Coral bleaching',
+    color: '#0F766E',
+    fact: 'When the ocean absorbs CO₂ from the air, it turns slightly more acidic. That dissolves coral skeletons and seashells, bleaching reefs white and brittle even before the water itself gets too warm.',
+  },
 ];
 
 export type Difficulty = 'easy' | 'medium' | 'hard';
@@ -72,7 +174,7 @@ export const DIFFICULTIES: Record<Difficulty, DifficultyDef> = {
 };
 
 export function getPairsForDifficulty(difficulty: Difficulty): PairDef[] {
-  return GHG_PAIRS.slice(0, DIFFICULTIES[difficulty].pairCount);
+  return CLIMATE_PAIRS.slice(0, DIFFICULTIES[difficulty].pairCount);
 }
 
 export function getLayoutForDifficulty(difficulty: Difficulty): { cols: number; rows: number } {
