@@ -92,7 +92,7 @@ const games: GameDef[] = [
     learn: 'How a clean technology scales from wafer to grid-connected farm',
     difficulty: 'Hard',
     playTime: '5 min',
-    icon: '🔢',
+    icon: '🧩',
     accent: '#B91C1C',
     available: true,
   },

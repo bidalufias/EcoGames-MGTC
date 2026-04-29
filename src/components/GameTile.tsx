@@ -76,7 +76,7 @@ export default function GameTile({
           minWidth: 0,
           position: 'relative',
           display: 'grid',
-          gridTemplateColumns: 'minmax(28%, 38%) 1fr',
+          gridTemplateColumns: 'minmax(22%, 34%) 1fr',
           containerType: 'size',
           containerName: 'gametile',
           background: '#FFFCF5',
