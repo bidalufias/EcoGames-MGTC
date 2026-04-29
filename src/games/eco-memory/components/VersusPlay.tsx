@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
+  DIFFICULTIES,
   getLayoutForDifficulty,
   getPairsForDifficulty,
   type Difficulty,
@@ -14,12 +15,12 @@ import {
   startGame,
   type GameState,
 } from '../engine';
-import EcoButton from '../../../components/EcoButton';
 import Board from './Board';
 import MatchBurst from './MatchBurst';
 import Confetti from './Confetti';
 import PlayerHUD from './PlayerHUD';
 import { audio } from '../audio';
+import { ACCENT, EMOJI_FONT, PAPER, PAPER_GRAIN } from '../theme';
 
 interface VersusPlayProps {
   difficulty: Difficulty;
@@ -44,16 +45,68 @@ const REVEAL_MATCH_MS = 700;
 const REVEAL_MISS_MS = 1000;
 const GAMEOVER_DELAY_MS = 1700;
 const STUDY_MS = 3500;
-const EMOJI_FONT = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
 
 const PLAYERS = [
-  { id: 0 as const, label: 'Player 1', emoji: '🟢', accent: '#0D9B4A' },
-  { id: 1 as const, label: 'Player 2', emoji: '🔵', accent: '#0EA5E9' },
+  { id: 0 as const, label: 'Player 1', emoji: '🟢', accent: '#15803D' },
+  { id: 1 as const, label: 'Player 2', emoji: '🔵', accent: '#1D4ED8' },
 ];
+
+interface PaperButtonProps {
+  children: React.ReactNode;
+  onClick?: () => void;
+  ariaLabel?: string;
+  ariaPressed?: boolean;
+  variant?: 'solid' | 'outline' | 'ghost';
+}
+
+function PaperButton({ children, onClick, ariaLabel, ariaPressed, variant = 'outline' }: PaperButtonProps) {
+  const styles =
+    variant === 'solid'
+      ? { background: ACCENT, color: '#FFFFFF', border: `1px solid ${ACCENT}` }
+      : variant === 'ghost'
+        ? { background: 'transparent', color: PAPER.subInk, border: '1px solid transparent' }
+        : { background: PAPER.surface, color: PAPER.ink, border: `1px solid ${PAPER.hairline}` };
+  return (
+    <Box
+      component="button"
+      type="button"
+      onClick={onClick}
+      aria-label={ariaLabel}
+      aria-pressed={ariaPressed}
+      sx={{
+        cursor: 'pointer',
+        borderRadius: 999,
+        px: 'clamp(10px, 1.8cqmin, 14px)',
+        py: 'clamp(5px, 1cqh, 8px)',
+        fontFamily: 'inherit',
+        fontSize: 'clamp(0.7rem, 1.6cqh, 0.82rem)',
+        fontWeight: 700,
+        letterSpacing: '0.02em',
+        minHeight: 32,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 'clamp(4px, 0.8cqmin, 6px)',
+        transition: 'background 0.15s, border-color 0.15s, color 0.15s',
+        '&:hover': {
+          background: variant === 'solid' ? ACCENT : '#FFFFFF',
+          borderColor: variant === 'ghost' ? PAPER.hairline : ACCENT,
+        },
+        '&:focus-visible': {
+          outline: `2px solid ${ACCENT}`,
+          outlineOffset: 2,
+        },
+        ...styles,
+      }}
+    >
+      {children}
+    </Box>
+  );
+}
 
 export default function VersusPlay({ difficulty, studyMode, onExit }: VersusPlayProps) {
   const pairs = getPairsForDifficulty(difficulty);
   const { cols: BOARD_COLS, rows: BOARD_ROWS } = getLayoutForDifficulty(difficulty);
+  const difficultyDef = DIFFICULTIES[difficulty];
 
   const [game, setGame] = useState<GameState>(() => {
     const fresh = startGame(pairs);
@@ -195,26 +248,60 @@ export default function VersusPlay({ difficulty, studyMode, onExit }: VersusPlay
       <Box
         sx={{
           height: '100%',
-          bgcolor: '#FAFBFC',
-          color: '#1A2332',
+          width: '100%',
+          background: PAPER.bg,
+          backgroundImage: PAPER_GRAIN,
+          backgroundRepeat: 'repeat',
+          backgroundSize: '220px 220px',
+          color: PAPER.ink,
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          px: 3,
-          py: 4,
+          pt: 'clamp(46px, 9cqh, 74px)',
+          pb: 'clamp(12px, 2.4cqh, 22px)',
+          px: 'clamp(16px, 3.5cqw, 44px)',
+          gap: 'clamp(8px, 1.6cqh, 14px)',
           overflow: 'hidden',
         }}
       >
-        <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }}>
-          <Typography variant="h3" sx={{ fontWeight: 800, mb: 1.5 }} align="center">
-            {winner === null ? "It's a tie! 🤝" : `${PLAYERS[winner].label} wins! 🎉`}
+        <motion.div initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }}>
+          <Typography
+            component="span"
+            sx={{
+              display: 'block',
+              color: ACCENT,
+              fontSize: 'clamp(0.6rem, 1.4cqh, 0.72rem)',
+              fontWeight: 800,
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              textAlign: 'center',
+            }}
+          >
+            Game over
+          </Typography>
+          <Typography
+            component="h1"
+            sx={{
+              m: 0,
+              color: PAPER.ink,
+              fontSize: 'clamp(1.5rem, 4.4cqh, 2.6rem)',
+              fontWeight: 900,
+              letterSpacing: '-0.035em',
+              textAlign: 'center',
+              lineHeight: 1.05,
+            }}
+          >
+            {winner === null ? "It's a tie" : `${PLAYERS[winner].label} wins`}
           </Typography>
           {winner !== null && (
             <Typography
-              variant="h5"
-              sx={{ color: PLAYERS[winner].accent, mb: 3, fontFamily: EMOJI_FONT }}
-              align="center"
+              sx={{
+                color: PLAYERS[winner].accent,
+                mt: 0.5,
+                textAlign: 'center',
+                fontSize: 'clamp(0.85rem, 2cqh, 1.1rem)',
+                fontWeight: 700,
+                fontFamily: EMOJI_FONT,
+              }}
             >
               {PLAYERS[winner].emoji} {stats[winner].matches} pairs · {stats[winner].score.toLocaleString()} pts
             </Typography>
@@ -224,12 +311,13 @@ export default function VersusPlay({ difficulty, studyMode, onExit }: VersusPlay
         <Box
           sx={{
             display: 'flex',
-            gap: 2,
-            mb: 3,
+            gap: 'clamp(10px, 2cqmin, 18px)',
+            mx: 'auto',
+            maxWidth: 720,
+            width: '100%',
+            flexShrink: 0,
             flexWrap: 'wrap',
             justifyContent: 'center',
-            maxWidth: 560,
-            width: '100%',
           }}
         >
           {PLAYERS.map(p => (
@@ -237,20 +325,39 @@ export default function VersusPlay({ difficulty, studyMode, onExit }: VersusPlay
               key={p.id}
               sx={{
                 flex: 1,
-                minWidth: 200,
-                p: 2,
-                borderRadius: 3,
-                background: '#FFFFFF',
-                border: `2px solid ${p.accent}33`,
+                minWidth: 'clamp(160px, 28cqw, 240px)',
+                p: 'clamp(10px, 2cqh, 16px)',
+                borderRadius: 'clamp(10px, 2cqmin, 14px)',
+                background: PAPER.surface,
+                border: `1.5px solid ${winner === p.id ? p.accent : PAPER.hairline}`,
                 textAlign: 'center',
               }}
             >
-              <Typography sx={{ fontSize: '1.4rem', fontFamily: EMOJI_FONT }}>{p.emoji}</Typography>
-              <Typography sx={{ fontWeight: 800, color: p.accent, mt: 0.5 }}>{p.label}</Typography>
-              <Typography sx={{ fontSize: '1.4rem', fontWeight: 900, mt: 0.5, color: '#1A2332' }}>
+              <Typography sx={{ fontSize: 'clamp(1.1rem, 2.6cqh, 1.4rem)', fontFamily: EMOJI_FONT }}>{p.emoji}</Typography>
+              <Typography
+                sx={{
+                  fontWeight: 800,
+                  color: p.accent,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  fontSize: 'clamp(0.62rem, 1.4cqh, 0.72rem)',
+                  mt: 0.5,
+                }}
+              >
+                {p.label}
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: 'clamp(1.1rem, 2.8cqh, 1.5rem)',
+                  fontWeight: 900,
+                  mt: 'clamp(2px, 0.5cqh, 4px)',
+                  color: PAPER.ink,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
                 {stats[p.id].matches}
               </Typography>
-              <Typography sx={{ fontSize: '0.78rem', color: '#5A6A7E', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              <Typography sx={{ fontSize: 'clamp(0.7rem, 1.5cqh, 0.78rem)', color: PAPER.meta, fontWeight: 600 }}>
                 pairs · {stats[p.id].score.toLocaleString()} pts
               </Typography>
             </Box>
@@ -260,45 +367,55 @@ export default function VersusPlay({ difficulty, studyMode, onExit }: VersusPlay
         {game.unlocked.length > 0 && (
           <Box
             sx={{
-              mb: 3,
-              maxWidth: 560,
+              flex: 1,
+              minHeight: 0,
+              maxWidth: 720,
               width: '100%',
-              maxHeight: '24cqh',
+              mx: 'auto',
               overflowY: 'auto',
+              borderTop: `1px solid ${PAPER.hairline}`,
+              borderBottom: `1px solid ${PAPER.hairline}`,
+              py: 'clamp(6px, 1.2cqh, 10px)',
               display: 'flex',
               flexDirection: 'column',
-              gap: 0.6,
+              gap: 'clamp(4px, 0.8cqh, 6px)',
             }}
           >
             {game.unlocked.map((u, i) => (
               <Box
                 key={i}
                 sx={{
-                  px: 1.5,
-                  py: 0.7,
-                  borderRadius: 2,
-                  background: `${u.color}10`,
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 'clamp(8px, 1.6cqmin, 12px)',
+                  px: 'clamp(8px, 1.6cqmin, 12px)',
+                  py: 'clamp(4px, 0.8cqh, 7px)',
+                  borderRadius: 'clamp(6px, 1.2cqmin, 10px)',
+                  background: `${u.color}0D`,
                   border: `1px solid ${u.color}25`,
-                  fontSize: 13,
+                  fontSize: 'clamp(0.72rem, 1.6cqh, 0.84rem)',
+                  color: PAPER.ink,
+                  lineHeight: 1.35,
                 }}
               >
-                <Box component="span" sx={{ fontFamily: EMOJI_FONT, mr: 0.5 }}>
+                <Box component="span" sx={{ fontFamily: EMOJI_FONT, flexShrink: 0 }}>
                   {u.emoji}
                 </Box>
-                <Box component="span" sx={{ fontWeight: 700, color: u.color, mr: 0.5 }}>
-                  {u.label}
+                <Box component="span" sx={{ minWidth: 0 }}>
+                  <Box component="span" sx={{ fontWeight: 800, color: u.color }}>
+                    {u.label}
+                  </Box>
+                  <Box component="span" sx={{ color: PAPER.faded, mx: 0.7 }}>—</Box>
+                  {u.fact}
                 </Box>
-                — {u.fact}
               </Box>
             ))}
           </Box>
         )}
 
-        <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', justifyContent: 'center' }}>
-          <EcoButton onClick={startNewGame}>Rematch</EcoButton>
-          <EcoButton onClick={onExit} variant="secondary">
-            Change mode
-          </EcoButton>
+        <Box sx={{ display: 'flex', gap: 1.2, justifyContent: 'center', flexShrink: 0 }}>
+          <PaperButton variant="solid" onClick={startNewGame}>↻ Rematch</PaperButton>
+          <PaperButton onClick={onExit}>↩ Change mode</PaperButton>
         </Box>
       </Box>
     );
@@ -308,29 +425,82 @@ export default function VersusPlay({ difficulty, studyMode, onExit }: VersusPlay
     <Box
       sx={{
         height: '100%',
-        bgcolor: '#F0F3F7',
-        color: '#1A2332',
+        width: '100%',
+        background: PAPER.bg,
+        backgroundImage: PAPER_GRAIN,
+        backgroundRepeat: 'repeat',
+        backgroundSize: '220px 220px',
+        color: PAPER.ink,
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        px: 'clamp(8px, 2cqw, 24px)',
-        py: 'clamp(8px, 2cqh, 16px)',
+        // Reserve top corners for App.tsx's BackToHome and MgtcLogo.
+        pt: 'clamp(46px, 9cqh, 74px)',
+        pb: 'clamp(8px, 1.6cqh, 14px)',
+        px: 'clamp(16px, 3.5cqw, 44px)',
+        gap: 'clamp(6px, 1.2cqh, 10px)',
         overflow: 'hidden',
+        position: 'relative',
       }}
     >
+      {/* Top action row + meta — single horizontal strip */}
       <Box
         sx={{
-          width: '100%',
-          maxWidth: 620,
-          flex: 1,
-          minHeight: 0,
           display: 'flex',
-          flexDirection: 'column',
-          gap: 1,
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 'clamp(8px, 1.6cqmin, 14px)',
+          flexShrink: 0,
         }}
       >
-        {/* Player 2 panel — rotated 180° so it reads right-side up from the
-            far side of a tabletop iPad. */}
+        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1, minWidth: 0 }}>
+          <Typography
+            component="span"
+            sx={{
+              color: ACCENT,
+              fontSize: 'clamp(0.62rem, 1.4cqh, 0.72rem)',
+              fontWeight: 800,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Eco Memory · Versus · {difficultyDef.label}
+          </Typography>
+          <Typography
+            component="span"
+            sx={{
+              color: PAPER.meta,
+              fontSize: 'clamp(0.62rem, 1.4cqh, 0.72rem)',
+              fontWeight: 600,
+              fontStyle: 'italic',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            · {totalPairs - game.matches} pairs left
+          </Typography>
+        </Box>
+        <Box sx={{ display: 'flex', gap: 'clamp(6px, 1.2cqmin, 10px)' }}>
+          <PaperButton
+            onClick={toggleMute}
+            ariaLabel={muted ? 'Unmute sound' : 'Mute sound'}
+            ariaPressed={muted}
+          >
+            <Box component="span" aria-hidden sx={{ fontFamily: EMOJI_FONT }}>
+              {muted ? '🔇' : '🔊'}
+            </Box>
+          </PaperButton>
+          <PaperButton onClick={startNewGame} ariaLabel="Start a new game">
+            <Box component="span" aria-hidden>↻</Box> New
+          </PaperButton>
+          <PaperButton variant="ghost" onClick={onExit} ariaLabel="Change mode and difficulty">
+            <Box component="span" aria-hidden>↩</Box> Modes
+          </PaperButton>
+        </Box>
+      </Box>
+
+      {/* Player 2 panel — rotated 180° so it reads right-side up from the
+          far side of a tabletop iPad. */}
+      <Box sx={{ flexShrink: 0 }}>
         <PlayerHUD
           label={PLAYERS[1].label}
           emoji={PLAYERS[1].emoji}
@@ -340,119 +510,66 @@ export default function VersusPlay({ difficulty, studyMode, onExit }: VersusPlay
           isActive={current === 1 && !finished}
           flipped
         />
+      </Box>
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, flexShrink: 0, flexWrap: 'wrap' }}>
-          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            <Box
-              sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 0.4,
-                px: 1,
-                py: 0.3,
-                borderRadius: 999,
-                background: '#9B59B61F',
-                color: '#9B59B6',
-                fontSize: '0.7rem',
-                fontWeight: 800,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                fontFamily: EMOJI_FONT,
-              }}
-            >
-              {difficulty === 'easy' ? '🌱 Easy' : difficulty === 'hard' ? '🌳 Hard' : '🌿 Medium'}
-            </Box>
-            <Typography sx={{ fontSize: 12, color: '#5A6A7E', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700 }}>
-              Pairs left:
-            </Typography>
-            <Typography sx={{ fontWeight: 800, color: '#1A2332' }}>
-              {totalPairs - game.matches}/{totalPairs}
-            </Typography>
-          </Box>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Box
-              component="button"
-              onClick={toggleMute}
-              aria-label={muted ? 'Unmute sound' : 'Mute sound'}
-              sx={{
-                background: '#FFFFFF',
-                border: '1px solid #E1E6ED',
-                borderRadius: 2,
-                px: 1.2,
-                py: 0.4,
-                cursor: 'pointer',
-                fontSize: '1rem',
-                color: muted ? '#A0AABB' : '#1A2332',
-              }}
-            >
-              {muted ? '🔇' : '🔊'}
-            </Box>
-            <EcoButton size="small" onClick={startNewGame}>
-              New Game
-            </EcoButton>
-            <EcoButton size="small" variant="ghost" onClick={onExit}>
-              Exit
-            </EcoButton>
-          </Box>
-        </Box>
-
-        <Box sx={{ flex: 1, minHeight: 0, minWidth: 0, display: 'grid', placeItems: 'center' }}>
-          <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
-            <Board
-              deck={game.deck}
-              cards={game.cards}
-              onFlip={onFlip}
-              disabled={locked}
-              cols={BOARD_COLS}
+      <Box sx={{ flex: 1, minHeight: 0, minWidth: 0, display: 'grid', placeItems: 'center' }}>
+        <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
+          <Board
+            deck={game.deck}
+            cards={game.cards}
+            onFlip={onFlip}
+            disabled={locked}
+            cols={BOARD_COLS}
+          />
+          {bursts.map(b => (
+            <MatchBurst
+              key={b.id}
+              x={b.x}
+              y={b.y}
+              points={b.points}
+              color={b.color}
+              onDone={() => setBursts(prev => prev.filter(p => p.id !== b.id))}
             />
-            {bursts.map(b => (
-              <MatchBurst
-                key={b.id}
-                x={b.x}
-                y={b.y}
-                points={b.points}
-                color={b.color}
-                onDone={() => setBursts(prev => prev.filter(p => p.id !== b.id))}
-              />
-            ))}
-            {showConfetti && <Confetti onDone={() => setShowConfetti(false)} />}
-            <AnimatePresence>
-              {studying && (
-                <motion.div
-                  initial={{ opacity: 0, y: -8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  style={{
-                    position: 'absolute',
-                    top: 8,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    zIndex: 35,
-                    pointerEvents: 'none',
+          ))}
+          {showConfetti && <Confetti onDone={() => setShowConfetti(false)} />}
+          <AnimatePresence>
+            {studying && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                style={{
+                  position: 'absolute',
+                  top: 8,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  zIndex: 35,
+                  pointerEvents: 'none',
+                }}
+              >
+                <Box
+                  sx={{
+                    px: 2,
+                    py: 0.7,
+                    borderRadius: 999,
+                    background: ACCENT,
+                    color: '#FFFFFF',
+                    fontSize: 'clamp(0.7rem, 1.6cqh, 0.82rem)',
+                    fontWeight: 800,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    boxShadow: `0 6px 18px ${ACCENT}55`,
                   }}
                 >
-                  <Box
-                    sx={{
-                      px: 2,
-                      py: 0.7,
-                      borderRadius: 999,
-                      background: '#0D9B4A',
-                      color: '#FFFFFF',
-                      fontSize: '0.78rem',
-                      fontWeight: 800,
-                      letterSpacing: '0.08em',
-                      textTransform: 'uppercase',
-                      boxShadow: '0 6px 18px rgba(13,155,74,0.35)',
-                    }}
-                  >
-                    📖 Memorise the board…
-                  </Box>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </Box>
+                  Memorise the board…
+                </Box>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </Box>
+      </Box>
 
+      <Box sx={{ flexShrink: 0 }}>
         <PlayerHUD
           label={PLAYERS[0].label}
           emoji={PLAYERS[0].emoji}
@@ -466,9 +583,10 @@ export default function VersusPlay({ difficulty, studyMode, onExit }: VersusPlay
       <AnimatePresence>
         {fact && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.92 }}
+            initial={{ opacity: 0, scale: 0.94 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.24, ease: 'easeOut' }}
             style={{
               position: 'absolute',
               top: '50%',
@@ -476,23 +594,34 @@ export default function VersusPlay({ difficulty, studyMode, onExit }: VersusPlay
               transform: 'translate(-50%, -50%)',
               zIndex: 50,
               pointerEvents: 'none',
+              maxWidth: 'min(440px, 70%)',
             }}
           >
             <Box
               sx={{
-                px: 2.5,
-                py: 1.2,
-                borderRadius: 2,
-                background: '#FFFFFFF2',
-                border: `2px solid ${PLAYERS[current].accent}55`,
-                maxWidth: 420,
+                px: 'clamp(12px, 2.4cqmin, 20px)',
+                py: 'clamp(8px, 1.6cqh, 12px)',
+                borderRadius: 'clamp(8px, 1.6cqmin, 14px)',
+                background: PAPER.surface,
+                border: `1.5px solid ${PLAYERS[current].accent}55`,
+                boxShadow: `0 12px 30px ${PLAYERS[current].accent}22, 0 1px 2px rgba(31,27,20,0.06)`,
                 textAlign: 'center',
-                boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
               }}
             >
-              <Typography sx={{ fontSize: 13, color: PLAYERS[current].accent, fontWeight: 700 }}>
-                💡 {fact}
-              </Typography>
+              <Box
+                component="span"
+                sx={{
+                  color: PLAYERS[current].accent,
+                  fontWeight: 800,
+                  letterSpacing: '0.04em',
+                  mr: 0.6,
+                }}
+              >
+                Fact —
+              </Box>
+              <Box component="span" sx={{ color: PAPER.ink, fontSize: 'clamp(0.74rem, 1.6cqh, 0.86rem)', fontWeight: 500 }}>
+                {fact}
+              </Box>
             </Box>
           </motion.div>
         )}

@@ -12,15 +12,21 @@ interface BoardProps {
 }
 
 /**
- * Square, viewport-fitting board. Mirrors the Climate 2048 pattern
- * (`SoloPlay.tsx:163-167`): an `aspectRatio: 1/1` wrapper sits inside a
- * `flex: 1, minHeight: 0` parent, so it always renders as the largest square
- * that fits the leftover space — no overflow on short iPad-landscape layouts.
+ * Aspect-ratio-constrained grid that always fits inside its parent without
+ * scrolling.
+ *
+ * The outer wrapper is a CSS size container so the inner grid can use
+ * `cqw`/`cqh` to compare its parent's width and height — the only way in CSS
+ * to pick "the largest box of a given aspect ratio that fits inside an
+ * arbitrary rectangle" purely with declarative styles. (Plain `100%` would
+ * resolve each dimension against a different reference, which can't express
+ * the cross-axis dependency.)
  */
 export default function Board({ deck, cards, onFlip, disabled, cols }: BoardProps) {
   const total = deck.length;
   const columns = cols ?? Math.ceil(Math.sqrt(total));
   const rows = Math.ceil(total / columns);
+  const ratio = columns / rows;
 
   return (
     <Box
@@ -30,19 +36,20 @@ export default function Board({ deck, cards, onFlip, disabled, cols }: BoardProp
         height: '100%',
         display: 'grid',
         placeItems: 'center',
+        minWidth: 0,
+        minHeight: 0,
+        containerType: 'size',
       }}
     >
       <Box
         sx={{
-          width: '100%',
-          height: '100%',
-          maxWidth: '100%',
-          maxHeight: '100%',
+          width: `min(100cqw, calc(100cqh * ${ratio}))`,
+          height: `min(100cqh, calc(100cqw / ${ratio}))`,
           aspectRatio: `${columns} / ${rows}`,
           display: 'grid',
           gridTemplateColumns: `repeat(${columns}, 1fr)`,
           gridAutoRows: '1fr',
-          gap: 'clamp(4px, 1.2cqi, 10px)',
+          gap: 'clamp(4px, 1.4cqi, 12px)',
           containerType: 'inline-size',
           padding: 'clamp(2px, 0.8cqi, 8px)',
         }}
