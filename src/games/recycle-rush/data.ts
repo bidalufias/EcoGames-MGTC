@@ -30,11 +30,11 @@ export const WASTE_ITEMS = [
 ];
 
 export const DIFFICULTY_LEVELS = [
-  { speed: 2, spawnRate: 120, types: 4 },   // Level 1
-  { speed: 2.5, spawnRate: 100, types: 6 },  // Level 2
-  { speed: 3, spawnRate: 85, types: 8 },     // Level 3
-  { speed: 3.5, spawnRate: 70, types: 10 },  // Level 4
-  { speed: 4, spawnRate: 55, types: 12 },    // Level 5
+  { speed: 1.5, spawnRate: 180, types: 4 },   // Level 1
+  { speed: 1.8, spawnRate: 150, types: 6 },   // Level 2
+  { speed: 2.2, spawnRate: 125, types: 8 },   // Level 3
+  { speed: 2.6, spawnRate: 105, types: 10 },  // Level 4
+  { speed: 3.0, spawnRate: 88,  types: 12 },  // Level 5
 ];
 
 export const POWER_UPS = [
@@ -50,9 +50,9 @@ export function randomPowerUp(): PowerUp {
 }
 
 export const SPEED_PRESETS = {
-  chill:  { id: 'chill',  label: 'Chill',  emoji: '🧘', speedMul: 0.7, spawnMul: 1.4 },
-  normal: { id: 'normal', label: 'Normal', emoji: '⚡', speedMul: 1.0, spawnMul: 1.0 },
-  rush:   { id: 'rush',   label: 'Rush',   emoji: '🔥', speedMul: 1.4, spawnMul: 0.7 },
+  chill:  { id: 'chill',  label: 'Chill',  emoji: '🧘', speedMul: 0.5, spawnMul: 1.5 },
+  normal: { id: 'normal', label: 'Normal', emoji: '⚡', speedMul: 0.8, spawnMul: 1.1 },
+  rush:   { id: 'rush',   label: 'Rush',   emoji: '🔥', speedMul: 1.2, spawnMul: 0.85 },
 } as const;
 
 export type SpeedKey = keyof typeof SPEED_PRESETS;
@@ -65,9 +65,18 @@ export function comboMultiplier(streak: number): number {
   return 1;
 }
 
+// Playfield geometry — wider cells and taller field so falling items have
+// real breathing room and are easier to track / aim at the bins below.
 export const PLAYFIELD_W = 5;
-export const PLAYFIELD_H = 12;
-export const CELL_SIZE = 50;
+export const CELL_W = 90;
+export const CELL_H = 54;
+export const ITEM_SIZE = 60;
+export const MISS_ROW = 10;            // item is "missed" at this row
+export const PLAYFIELD_H_PX = MISS_ROW * CELL_H + ITEM_SIZE; // 600
+export const PLAYFIELD_W_PX = PLAYFIELD_W * CELL_W;          // 450
+// Per-tick fall step (rows / 16ms tick) before level/preset multipliers.
+// Halved from the previous build so even Rush feels manageable.
+export const FALL_STEP = 0.025;
 
 export function randomWaste(level: number) {
   const types = Math.min(DIFFICULTY_LEVELS[Math.min(level, 4)].types, WASTE_ITEMS.length);
