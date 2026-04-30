@@ -9,27 +9,41 @@ export const BINS = [
   { id: 'ewaste', emoji: '💻', name: 'E-Waste', color: '#9C27B0', accepts: ['phone', 'cable', 'circuit'] },
 ];
 
-// Items are intentionally interleaved by bin: index 0 covers each bin
-// once (recycle, compost, landfill, hazardous, e-waste), then index
-// 5–9 adds a second item from each bin, then 10+ rounds out the pool.
-// `randomWaste(level)` slices the first `types` entries, so this order
-// guarantees every level has variety across all five bins.
+// Items are intentionally interleaved by bin in groups of 5 so every
+// "round" of 5 covers all 5 bins. `randomWaste(level)` slices the first
+// `types` entries — keeping `types` at multiples of 5 guarantees every
+// level has equal coverage across bins.
 export const WASTE_ITEMS = [
   // Round 1 — one of each bin
-  { type: 'plastic',   emoji: '🥤', name: 'Plastic Bottle', bin: 'recycle',   fact: 'Only 9% of all plastic ever made has been recycled' },
-  { type: 'food',      emoji: '🍌', name: 'Banana Peel',    bin: 'compost',   fact: 'Food waste in landfills produces methane — compost instead!' },
-  { type: 'styrofoam', emoji: '📦', name: 'Styrofoam',      bin: 'landfill',  fact: 'Styrofoam takes 500+ years to decompose' },
-  { type: 'battery',   emoji: '🔋', name: 'Battery',        bin: 'hazardous', fact: 'One battery can pollute 600,000 liters of water' },
-  { type: 'phone',     emoji: '📱', name: 'Old Phone',      bin: 'ewaste',    fact: 'E-waste is the fastest growing waste stream globally' },
+  { type: 'plastic',   emoji: '🥤', name: 'Plastic Bottle',  bin: 'recycle',   fact: 'Only 9% of all plastic ever made has been recycled' },
+  { type: 'food',      emoji: '🍌', name: 'Banana Peel',     bin: 'compost',   fact: 'Food waste in landfills produces methane — compost instead!' },
+  { type: 'styrofoam', emoji: '📦', name: 'Styrofoam',       bin: 'landfill',  fact: 'Styrofoam takes 500+ years to decompose' },
+  { type: 'battery',   emoji: '🔋', name: 'Battery',         bin: 'hazardous', fact: 'One battery can pollute 600,000 liters of water' },
+  { type: 'phone',     emoji: '📱', name: 'Old Phone',       bin: 'ewaste',    fact: 'E-waste is the fastest growing waste stream globally' },
   // Round 2 — second of each bin
-  { type: 'paper',     emoji: '📰', name: 'Newspaper',      bin: 'recycle',   fact: 'Recycling 1 ton of paper saves 17 trees' },
-  { type: 'garden',    emoji: '🍂', name: 'Leaves',         bin: 'compost',   fact: 'Composting reduces landfill waste by up to 30%' },
-  { type: 'mixed',     emoji: '🧸', name: 'Stuffed Toy',    bin: 'landfill',  fact: 'Most toys end up in landfill — donate or upcycle!' },
-  { type: 'chemical',  emoji: '🧴', name: 'Cleaner',        bin: 'hazardous', fact: 'Household chemicals contaminate soil and groundwater' },
-  { type: 'cable',     emoji: '🔌', name: 'Cable',          bin: 'ewaste',    fact: 'E-waste contains valuable metals like gold, silver, and copper' },
-  // Round 3 — fills out recycle
-  { type: 'glass',     emoji: '🍶', name: 'Glass Jar',      bin: 'recycle',   fact: 'Glass is 100% recyclable and can be recycled endlessly' },
-  { type: 'metal',     emoji: '🥫', name: 'Tin Can',        bin: 'recycle',   fact: 'Recycling aluminum saves 95% of the energy vs making new' },
+  { type: 'paper',     emoji: '📰', name: 'Newspaper',       bin: 'recycle',   fact: 'Recycling 1 ton of paper saves 17 trees' },
+  { type: 'garden',    emoji: '🍂', name: 'Leaves',          bin: 'compost',   fact: 'Composting reduces landfill waste by up to 30%' },
+  { type: 'mixed',     emoji: '🧸', name: 'Stuffed Toy',     bin: 'landfill',  fact: 'Most toys end up in landfill — donate or upcycle!' },
+  { type: 'chemical',  emoji: '🧴', name: 'Cleaner',         bin: 'hazardous', fact: 'Household chemicals contaminate soil and groundwater' },
+  { type: 'cable',     emoji: '🔌', name: 'Cable',           bin: 'ewaste',    fact: 'E-waste contains valuable metals like gold, silver, and copper' },
+  // Round 3
+  { type: 'glass',     emoji: '🍶', name: 'Glass Jar',       bin: 'recycle',   fact: 'Glass is 100% recyclable and can be recycled endlessly' },
+  { type: 'apple',     emoji: '🍎', name: 'Apple Core',      bin: 'compost',   fact: 'An apple core composts in 1-2 months and feeds the soil' },
+  { type: 'cigarette', emoji: '🚬', name: 'Cigarette Butt',  bin: 'landfill',  fact: 'Cigarette butts are the most-littered item — toxic in waterways' },
+  { type: 'paint',     emoji: '🎨', name: 'Paint',           bin: 'hazardous', fact: 'Latex paint can dry out for landfill; oil paints need hazardous drop-off' },
+  { type: 'laptop',    emoji: '💻', name: 'Old Laptop',      bin: 'ewaste',    fact: 'A laptop has 60+ recoverable elements — recycle for the materials' },
+  // Round 4
+  { type: 'metal',     emoji: '🥫', name: 'Tin Can',         bin: 'recycle',   fact: 'Recycling aluminum saves 95% of the energy vs making new' },
+  { type: 'carrot',    emoji: '🥕', name: 'Carrot Scraps',   bin: 'compost',   fact: 'Carrot tops and peels are nitrogen-rich for compost' },
+  { type: 'lipstick',  emoji: '💄', name: 'Lipstick',        bin: 'landfill',  fact: 'Most cosmetic packaging is mixed plastic — usually not recyclable' },
+  { type: 'pills',     emoji: '💊', name: 'Old Medicine',    bin: 'hazardous', fact: 'Flushed medication pollutes drinking water — return to a pharmacy' },
+  { type: 'monitor',   emoji: '🖥️', name: 'Monitor',         bin: 'ewaste',    fact: 'Monitors contain lead and mercury — never bin them' },
+  // Round 5
+  { type: 'carton',    emoji: '🥛', name: 'Milk Carton',     bin: 'recycle',   fact: 'Cartons mix paper, plastic, and aluminum — many programs accept them' },
+  { type: 'eggshells', emoji: '🥚', name: 'Eggshells',       bin: 'compost',   fact: 'Crushed eggshells return calcium to the soil' },
+  { type: 'bandage',   emoji: '🩹', name: 'Used Bandage',    bin: 'landfill',  fact: 'Used bandages can’t be recycled — wrap and bin them' },
+  { type: 'lab',       emoji: '🧪', name: 'Lab Chemical',    bin: 'hazardous', fact: 'Lab chemicals must go to a certified hazardous waste facility' },
+  { type: 'headphones',emoji: '🎧', name: 'Headphones',      bin: 'ewaste',    fact: 'Headphones mix metal, plastic, and circuitry — drop at e-waste' },
 ];
 
 // Tetris-style ramp: level 1 has a single slow item at a time so new
@@ -41,10 +55,10 @@ export const WASTE_ITEMS = [
 //   types         — how many waste types are in the random pool
 export const DIFFICULTY_LEVELS = [
   { speed: 1.0, spawnInterval: 2400, maxConcurrent: 1, types: 5 },   // Level 1: one of each bin
-  { speed: 1.3, spawnInterval: 1900, maxConcurrent: 2, types: 7 },   // Level 2
-  { speed: 1.6, spawnInterval: 1500, maxConcurrent: 3, types: 9 },   // Level 3
-  { speed: 2.0, spawnInterval: 1100, maxConcurrent: 4, types: 11 },  // Level 4
-  { speed: 2.4, spawnInterval: 850,  maxConcurrent: 5, types: 12 },  // Level 5
+  { speed: 1.3, spawnInterval: 1900, maxConcurrent: 2, types: 10 },  // Level 2: two of each
+  { speed: 1.6, spawnInterval: 1500, maxConcurrent: 3, types: 15 },  // Level 3: three of each
+  { speed: 2.0, spawnInterval: 1100, maxConcurrent: 4, types: 20 },  // Level 4: four of each
+  { speed: 2.4, spawnInterval: 850,  maxConcurrent: 5, types: 25 },  // Level 5: full pool
 ];
 
 export const POWER_UPS = [

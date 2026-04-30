@@ -584,16 +584,98 @@ export default function RecycleRushGame() {
         )}
       </Box>
 
-      {/* Stage — playfield + bin tray live inside one natural-pixel
-          container that scales as a unit, so each bin is exactly under
-          its lane and falling items drop straight into the right slot. */}
-      <Box
-        ref={fitRef}
-        sx={{ flex: 1, minHeight: 0, minWidth: 0, width: '100%', display: 'grid', placeItems: 'center' }}
-      >
+      {/* 3-column main row: active-item panel | stage | fact panel.
+          Side panels keep the playfield free of overlapping toasts. */}
+      <Box sx={{
+        flex: 1, minHeight: 0, minWidth: 0, width: '100%',
+        display: 'flex',
+        alignItems: 'stretch',
+        justifyContent: 'center',
+        gap: 'clamp(6px, 1.4cqw, 18px)',
+      }}>
+        {/* Left panel — identifies the currently active item so the
+            player knows what they're sorting at a glance. */}
         <Box sx={{
-          width: STAGE_NATURAL.w,
-          height: STAGE_NATURAL.h,
+          flex: '0 0 auto',
+          width: 'clamp(140px, 18cqw, 220px)',
+          minWidth: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          pt: 1,
+        }}>
+          <Typography sx={{ fontSize: 11, color: '#8892B0', letterSpacing: '0.12em', mb: 1, fontWeight: 700 }}>
+            NOW FALLING
+          </Typography>
+          {activeWasteItem ? (
+            <Box sx={{
+              width: '100%',
+              borderRadius: 2,
+              background: 'linear-gradient(180deg, #FFFFFF, #F5F7FA)',
+              border: '1px solid #E8EDF2',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+              p: 1.5,
+              display: 'flex', flexDirection: 'column', alignItems: 'center',
+              gap: 0.6,
+            }}>
+              <Box sx={{
+                width: 64, height: 64, borderRadius: '50%',
+                background: 'linear-gradient(180deg, #FFFFFF, #F2F4F8)',
+                border: '2px solid rgba(26,35,50,0.10)',
+                boxShadow: '0 4px 10px rgba(0,0,0,0.08)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 36,
+              }}>
+                {activeWasteItem.waste.emoji}
+              </Box>
+              <Typography sx={{ fontSize: 14, fontWeight: 800, color: '#1A2332', textAlign: 'center', lineHeight: 1.2 }}>
+                {activeWasteItem.waste.name}
+              </Typography>
+              {(() => {
+                const trajectoryBin = BINS[activeWasteItem.col];
+                return trajectoryBin ? (
+                  <Box sx={{ mt: 0.6, textAlign: 'center' }}>
+                    <Typography sx={{ fontSize: 10, color: '#8892B0', letterSpacing: '0.08em', fontWeight: 700 }}>
+                      LANE {activeWasteItem.col + 1} →
+                    </Typography>
+                    <Typography sx={{ fontSize: 12, fontWeight: 700, color: trajectoryBin.color, mt: 0.2 }}>
+                      {trajectoryBin.emoji} {trajectoryBin.name}
+                    </Typography>
+                  </Box>
+                ) : null;
+              })()}
+              <Typography sx={{ fontSize: 10, color: '#8892B0', mt: 0.6, textAlign: 'center', lineHeight: 1.4 }}>
+                Tap a bin or press <b>1–5</b> · arrows nudge ←→
+              </Typography>
+            </Box>
+          ) : (
+            <Box sx={{
+              width: '100%',
+              borderRadius: 2,
+              background: '#FAFBFC',
+              border: '1px dashed #D4DBE5',
+              p: 2,
+              textAlign: 'center',
+            }}>
+              <Typography sx={{ fontSize: 26, opacity: 0.4 }}>📦</Typography>
+              <Typography sx={{ fontSize: 12, color: '#8892B0', mt: 0.5 }}>
+                Waiting for next item…
+              </Typography>
+            </Box>
+          )}
+        </Box>
+
+        {/* Stage — playfield + bin tray live inside one natural-pixel
+            container that scales as a unit, so each bin is exactly under
+            its lane and falling items drop straight into the right slot. */}
+        <Box
+          ref={fitRef}
+          sx={{ flex: 1, minHeight: 0, minWidth: 0, display: 'grid', placeItems: 'center' }}
+        >
+          <Box sx={{
+            width: STAGE_NATURAL.w,
+            height: STAGE_NATURAL.h,
           transform: `scale(${fitScale})`,
           transformOrigin: 'center center',
           display: 'flex',
@@ -805,27 +887,80 @@ export default function RecycleRushGame() {
             })}
           </Box>
         </Box>
-      </Box>
+        </Box>
 
-      {/* Fact — green tint on streak milestones, red tint on wrong sorts.
-          Anchored above the bin tray so it doesn't cover the bins. */}
-      <AnimatePresence>
-        {fact && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            style={{ position: 'absolute', bottom: 'clamp(96px, 15cqh, 140px)', left: '50%', transform: 'translateX(-50%)', zIndex: 50, width: 'min(440px, 90%)' }}>
-            <Box sx={{
-              px: 3, py: 1.5, borderRadius: 2,
-              background: fact.tone === 'good' ? '#FF8C42E6' : '#C0392BE6',
-              boxShadow: '0 6px 18px rgba(0,0,0,0.18)',
-              textAlign: 'center',
-            }}>
-              <Typography sx={{ fontSize: 13, color: '#FFFFFF', fontWeight: 600, lineHeight: 1.4 }}>
-                {fact.text}
-              </Typography>
-            </Box>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        {/* Right panel — fact card. Anchored alongside the playfield so
+            it never covers the drop zones; streak facts are orange,
+            mistake facts are red, and a quick Bin Guide fills the
+            placeholder until the first fact arrives. */}
+        <Box sx={{
+          flex: '0 0 auto',
+          width: 'clamp(170px, 22cqw, 260px)',
+          minWidth: 0,
+          display: 'flex', flexDirection: 'column',
+          pt: 1,
+          gap: 1,
+        }}>
+          <Typography sx={{ fontSize: 11, color: '#8892B0', letterSpacing: '0.12em', fontWeight: 700 }}>
+            DID YOU KNOW?
+          </Typography>
+          <AnimatePresence mode="wait">
+            {fact ? (
+              <motion.div
+                key={fact.text}
+                initial={{ opacity: 0, x: 16 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 16 }}
+                transition={{ duration: 0.22 }}
+              >
+                <Box sx={{
+                  px: 1.6, py: 1.2, borderRadius: 2,
+                  background: fact.tone === 'good' ? '#FF8C42E6' : '#C0392BE6',
+                  boxShadow: '0 6px 18px rgba(0,0,0,0.16)',
+                }}>
+                  <Typography sx={{ fontSize: 12, color: '#FFFFFF', fontWeight: 600, lineHeight: 1.45 }}>
+                    {fact.text}
+                  </Typography>
+                </Box>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="default"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.22 }}
+              >
+                <Box sx={{
+                  borderRadius: 2,
+                  background: '#FFFFFF',
+                  border: '1px solid #E8EDF2',
+                  p: 1.4,
+                }}>
+                  <Typography sx={{ fontSize: 11, fontWeight: 700, color: '#1A2332', mb: 0.8, letterSpacing: '0.04em' }}>
+                    BIN GUIDE
+                  </Typography>
+                  {BINS.map(bin => (
+                    <Box key={bin.id} sx={{
+                      display: 'flex', alignItems: 'center', gap: 0.8,
+                      py: 0.4,
+                      borderTop: '1px solid #F2F4F8',
+                    }}>
+                      <Box component="span" sx={{ fontSize: 18 }}>{bin.emoji}</Box>
+                      <Typography sx={{ fontSize: 11, fontWeight: 700, color: bin.color }}>
+                        {bin.name}
+                      </Typography>
+                    </Box>
+                  ))}
+                  <Typography sx={{ fontSize: 10, color: '#8892B0', mt: 1, textAlign: 'center', fontStyle: 'italic' }}>
+                    Sort 5 in a row for a fact
+                  </Typography>
+                </Box>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </Box>
+      </Box>
     </Box>
   );
 }
