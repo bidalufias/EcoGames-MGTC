@@ -11,13 +11,10 @@ import GameOver from './components/GameOver';
 import Leaderboard from './components/Leaderboard';
 import ChallengerNameEntry from './components/ChallengerNameEntry';
 import ChampionRoundEnd from './components/ChampionRoundEnd';
-import { Box, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 
 type Screen = 'intro' | 'modeselect' | 'nameentry' | 'countdown' | 'playing' | 'gameover' | 'leaderboard' | 'challenger' | 'championend';
 
 export default function ClimateNinjaGame() {
-  const navigate = useNavigate();
   const [screen, setScreen] = useState<Screen>('intro');
   const [mode, setMode] = useState<GameMode>('1p');
   const [speed, setSpeed] = useState(1);
@@ -149,50 +146,18 @@ export default function ClimateNinjaGame() {
         />
         <GameHUD players={players.length ? players : []} zones={zones} combos={combos} powerups={powerups} frenzy={frenzy} />
         {paused && <PauseMenu onResume={() => setPaused(false)} onQuit={() => setScreen('gameover')} />}
-
-        {/* Back button */}
-        <Box
-          onClick={() => navigate('/')}
-          sx={{
-            position: 'absolute', top: 12, left: 12, zIndex: 1001,
-            px: 1.5, py: 0.5, borderRadius: 2,
-            background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(8px)',
-            border: '1px solid #E8EDF2', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: 0.5,
-            '&:hover': { background: 'rgba(255,255,255,0.95)' },
-            transition: 'background 0.2s',
-          }}
-        >
-          <Typography sx={{ fontSize: 14, color: '#5A6A7E', fontWeight: 600 }}>← Home</Typography>
-        </Box>
       </div>
     );
   }
 
   if (screen === 'gameover') {
     return (
-      <Box sx={{ position: 'relative' }}>
-        <GameOver
-          players={players}
-          playerNames={playerNames}
-          onPlayAgain={handlePlayAgain}
-          onViewLeaderboard={() => setScreen('leaderboard')}
-        />
-        {/* Back button */}
-        <Box
-          onClick={() => navigate('/')}
-          sx={{
-            position: 'absolute', top: 12, left: 12, zIndex: 10,
-            px: 1.5, py: 0.5, borderRadius: 2,
-            background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(8px)',
-            border: '1px solid #E8EDF2', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: 0.5,
-            '&:hover': { background: 'rgba(255,255,255,0.95)' },
-          }}
-        >
-          <Typography sx={{ fontSize: 14, color: '#5A6A7E', fontWeight: 600 }}>← Home</Typography>
-        </Box>
-      </Box>
+      <GameOver
+        players={players}
+        playerNames={playerNames}
+        onPlayAgain={handlePlayAgain}
+        onViewLeaderboard={() => setScreen('leaderboard')}
+      />
     );
   }
 

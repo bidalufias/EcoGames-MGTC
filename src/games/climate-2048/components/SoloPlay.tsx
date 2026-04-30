@@ -145,6 +145,10 @@ export default function SoloPlay({ track, onChangeMode }: SoloPlayProps) {
         px: 3,
         py: 'clamp(12px, 2.5cqh, 28px)',
         overflow: 'hidden',
+        '@media (orientation: portrait) and (max-width: 1024px)': {
+          px: '12px',
+          pt: '64px',
+        },
       }}
     >
       <InGameMenuButton onClick={onChangeMode} ariaLabel="Back to Climate 2048 main menu" />
@@ -153,7 +157,20 @@ export default function SoloPlay({ track, onChangeMode }: SoloPlayProps) {
       {/* HUD + controls + board, capped to 520px wide; the board itself
           shrinks to fit the leftover height so nothing clips on short viewports.
           A top offset clears the absolutely-positioned Menu button + logo above. */}
-      <Box sx={{ width: '100%', maxWidth: 520, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 1.4, mt: 'clamp(28px, 5cqh, 44px)' }}>
+      <Box sx={{
+        width: '100%',
+        maxWidth: 520,
+        flex: 1,
+        minHeight: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 1.4,
+        mt: 'clamp(28px, 5cqh, 44px)',
+        '@media (orientation: portrait) and (max-width: 1024px)': {
+          mt: 0,
+          gap: 1,
+        },
+      }}>
         <HUD
           title="Climate 2048"
           subtitle={subtitle}

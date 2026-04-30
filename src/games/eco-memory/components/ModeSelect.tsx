@@ -301,6 +301,11 @@ export default function ModeSelect({ onPick }: ModeSelectProps) {
         px: 'clamp(16px, 3.5cqw, 44px)',
         gap: 'clamp(10px, 2cqh, 18px)',
         overflow: 'hidden',
+        '@media (orientation: portrait) and (max-width: 1024px)': {
+          pt: '72px',
+          px: '14px',
+          overflowY: 'auto',
+        },
       }}
     >
       {/* Title block */}
@@ -473,6 +478,10 @@ export default function ModeSelect({ onPick }: ModeSelectProps) {
           gridTemplateColumns: 'minmax(220px, 28%) 1fr',
           gap: 'clamp(12px, 2.4cqmin, 22px)',
           alignItems: 'stretch',
+          '@media (orientation: portrait) and (max-width: 1024px)': {
+            gridTemplateColumns: '1fr',
+            minHeight: 'auto',
+          },
         }}
       >
         {/* Left column — mode picks, stacked. */}

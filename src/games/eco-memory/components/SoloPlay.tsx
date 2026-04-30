@@ -452,6 +452,11 @@ export default function SoloPlay({ difficulty, studyMode, onExit }: SoloPlayProp
         gap: 'clamp(8px, 1.6cqh, 14px)',
         overflow: 'hidden',
         position: 'relative',
+        '@media (orientation: portrait) and (max-width: 1024px)': {
+          pt: '64px',
+          px: '12px',
+          gap: '8px',
+        },
       }}
     >
       {/* Top-left Menu (single way back to ModeSelect now that the global
@@ -467,6 +472,9 @@ export default function SoloPlay({ difficulty, studyMode, onExit }: SoloPlayProp
           gap: 'clamp(6px, 1.2cqmin, 10px)',
           flexShrink: 0,
           mt: 'clamp(28px, 5cqh, 44px)',
+          '@media (orientation: portrait) and (max-width: 1024px)': {
+            mt: 0,
+          },
         }}
       >
         <PaperButton
@@ -495,7 +503,9 @@ export default function SoloPlay({ difficulty, studyMode, onExit }: SoloPlayProp
 
       {/* Main play area — board on the left, persistent fact stack on the
           right. Putting facts in the empty corridor next to the board means
-          they don't cover any cards and the player can re-read them later. */}
+          they don't cover any cards and the player can re-read them later.
+          On portrait phones the row stacks: facts drop below the board with
+          a capped max-height so the cards keep the bulk of the screen. */}
       <Box
         sx={{
           flex: 1,
@@ -505,6 +515,10 @@ export default function SoloPlay({ difficulty, studyMode, onExit }: SoloPlayProp
           flexDirection: 'row',
           gap: 'clamp(10px, 2cqmin, 18px)',
           alignItems: 'stretch',
+          '@media (orientation: portrait) and (max-width: 1024px)': {
+            flexDirection: 'column',
+            gap: '8px',
+          },
         }}
       >
         <Box sx={{ flex: 1, minHeight: 0, minWidth: 0, display: 'grid', placeItems: 'center' }}>
@@ -590,6 +604,10 @@ function FactStack({ unlocked }: FactStackProps) {
         display: 'flex',
         flexDirection: 'column',
         minHeight: 0,
+        '@media (orientation: portrait) and (max-width: 1024px)': {
+          width: '100%',
+          maxHeight: '22vh',
+        },
       }}
     >
       <Box

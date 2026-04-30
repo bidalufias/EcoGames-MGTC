@@ -22,6 +22,14 @@ export default function StartScreen({ onSelectMode }: Props) {
       minHeight: '100%', bgcolor: '#FAFBFC', color: '#1A2332',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
       px: 3, py: 4,
+      // Portrait phones: clear the absolutely-positioned BackToHome + MGTC
+      // logo and let the page scroll if the mode tiles overflow.
+      '@media (orientation: portrait) and (max-width: 1024px)': {
+        justifyContent: 'flex-start',
+        pt: '72px',
+        pb: '24px',
+        overflowY: 'auto',
+      },
     }}>
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
         <Typography variant="h4" component="h1" align="center" sx={{
@@ -81,7 +89,7 @@ export default function StartScreen({ onSelectMode }: Props) {
       </Grid>
 
       <Typography variant="body2" sx={{ color: '#5A6A7E', mb: 1 }}>Speed (quick select)</Typography>
-      <Box sx={{ display: 'flex', gap: 1, mb: 4 }}>
+      <Box sx={{ display: 'flex', gap: 1, mb: 4, flexWrap: 'wrap', justifyContent: 'center' }}>
         {speeds.map(s => (
           <EcoButton key={s} variant="secondary" size="small" onClick={() => onSelectMode('1p', s)}>
             {s}x

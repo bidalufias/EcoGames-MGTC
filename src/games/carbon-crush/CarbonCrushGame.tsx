@@ -124,7 +124,7 @@ export default function CarbonCrushGame() {
   // --- Intro ---
   if (screen === 'intro') {
     return (
-      <Box sx={{
+      <Box className="game-screen-stack" sx={{
         height: '100%', bgcolor: '#FAFBFC', color: '#1A2332',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         px: 3, py: 4, overflow: 'hidden',
@@ -172,7 +172,7 @@ export default function CarbonCrushGame() {
   // --- Leaderboard ---
   if (screen === 'leaderboard') {
     return (
-      <Box sx={{
+      <Box className="game-screen-stack" sx={{
         minHeight: '100%', bgcolor: '#FAFBFC', color: '#1A2332',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         px: 3, py: 4,
@@ -191,7 +191,7 @@ export default function CarbonCrushGame() {
   // --- Game Over ---
   if (screen === 'gameover') {
     return (
-      <Box sx={{
+      <Box className="game-screen-stack" sx={{
         height: '100%', bgcolor: '#FAFBFC', color: '#1A2332',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         px: 3, overflow: 'hidden',
@@ -244,6 +244,10 @@ export default function CarbonCrushGame() {
       pt: 'clamp(48px, 7cqh, 72px)', pb: 'clamp(12px, 2cqh, 24px)',
       px: 'clamp(8px, 2cqw, 24px)', gap: 'clamp(6px, 1.4cqh, 14px)',
       overflow: 'hidden',
+      '@media (orientation: portrait) and (max-width: 1024px)': {
+        pt: '64px',
+        px: '8px',
+      },
     }}>
       {/* HUD */}
       <Box sx={{ display: 'flex', gap: 'clamp(16px, 3cqw, 32px)', alignItems: 'center', flexShrink: 0 }}>

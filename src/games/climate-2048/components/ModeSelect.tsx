@@ -107,6 +107,7 @@ function ModeCard({ title, tagline, emoji, accent, bullets, onPick, landscapeOnl
 export default function ModeSelect({ onPick, onBack }: ModeSelectProps) {
   return (
     <Box
+      className="game-screen-stack"
       sx={{
         height: '100%',
         bgcolor: '#FAF8EF',
@@ -156,6 +157,11 @@ export default function ModeSelect({ onPick, onBack }: ModeSelectProps) {
           display: 'flex',
           gap: 3,
           alignItems: 'stretch',
+          '@media (orientation: portrait) and (max-width: 1024px)': {
+            flexDirection: 'column',
+            mt: 2,
+            gap: 2,
+          },
         }}
       >
         <ModeCard
