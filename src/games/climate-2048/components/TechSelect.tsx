@@ -87,6 +87,7 @@ function TechCard({ track, onPick }: { track: TechTrack; onPick: () => void }) {
 export default function TechSelect({ onPick, onBack, modeLabel }: TechSelectProps) {
   return (
     <Box
+      className="game-screen-stack"
       sx={{
         height: '100%',
         bgcolor: '#FAF8EF',

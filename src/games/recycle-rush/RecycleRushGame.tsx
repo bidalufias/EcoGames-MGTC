@@ -385,7 +385,7 @@ export default function RecycleRushGame() {
       <>
         <BackToHome />
         <MgtcLogo />
-      <Box sx={{
+      <Box className="game-screen-stack" sx={{
         height: '100%', bgcolor: '#FAFBFC', color: '#1A2332',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         px: 3, py: 4, overflow: 'hidden',
@@ -466,7 +466,7 @@ export default function RecycleRushGame() {
       <>
         <BackToHome />
         <MgtcLogo />
-      <Box sx={{
+      <Box className="game-screen-stack" sx={{
         minHeight: '100%', bgcolor: '#FAFBFC', color: '#1A2332',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         px: 3, py: 4,
@@ -489,7 +489,7 @@ export default function RecycleRushGame() {
       <>
         <BackToHome />
         <MgtcLogo />
-      <Box sx={{
+      <Box className="game-screen-stack" sx={{
         height: '100%', bgcolor: '#FAFBFC', color: '#1A2332',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         px: 3, overflow: 'hidden',
@@ -571,6 +571,13 @@ export default function RecycleRushGame() {
       pt: 'clamp(16px, 2.5cqh, 28px)', pb: 'clamp(12px, 2cqh, 24px)',
       px: 'clamp(8px, 2cqw, 24px)', gap: 'clamp(6px, 1.2cqh, 12px)',
       touchAction: 'none', userSelect: 'none', overflow: 'hidden',
+      // Portrait phones: clear the top-left menu chip + top-right logo,
+      // and keep the gutter gentle so the playfield gets vertical room.
+      '@media (orientation: portrait) and (max-width: 1024px)': {
+        pt: '64px',
+        px: '8px',
+        gap: '6px',
+      },
     }}>
       {/* In-game Menu button — single way back to the intro screen
           since the global header is hidden during play. Top-left to match
@@ -621,17 +628,70 @@ export default function RecycleRushGame() {
         )}
       </Box>
 
+      {/* Portrait-only inline status pill. Side panels are hidden on
+          phones to free vertical space, so this slim pill carries the
+          "what am I sorting / which lane is right" job above the
+          playfield in just one line. */}
+      {activeWasteItem && (() => {
+        const trajectoryBin = BINS[activeWasteItem.col];
+        const isCorrectLane = trajectoryBin?.id === activeWasteItem.waste.bin;
+        return (
+          <Box sx={{
+            display: 'none',
+            '@media (orientation: portrait) and (max-width: 1024px)': {
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              flexShrink: 0,
+              px: 1.5,
+              py: 0.6,
+              borderRadius: 999,
+              background: isCorrectLane ? '#E8F5E9' : '#FFFFFF',
+              border: isCorrectLane ? '1px solid #4CAF50' : '1px solid #E8EDF2',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+              maxWidth: '94%',
+            },
+          }}>
+            <Box component="span" sx={{ fontSize: 22, lineHeight: 1 }}>{activeWasteItem.waste.emoji}</Box>
+            <Typography sx={{ fontSize: 13, fontWeight: 800, color: '#1A2332', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {activeWasteItem.waste.name}
+            </Typography>
+            <Box component="span" sx={{ color: '#8892B0', fontWeight: 700, fontSize: 12 }}>→</Box>
+            {trajectoryBin && (
+              <Typography sx={{
+                fontSize: 12,
+                fontWeight: 800,
+                color: isCorrectLane ? '#2E7D32' : trajectoryBin.color,
+                whiteSpace: 'nowrap',
+              }}>
+                {isCorrectLane ? '✓' : `L${activeWasteItem.col + 1}`} {trajectoryBin.emoji}
+              </Typography>
+            )}
+          </Box>
+        );
+      })()}
+
       {/* 3-column main row: active-item panel | stage | fact panel.
-          Side panels keep the playfield free of overlapping toasts. */}
+          Side panels keep the playfield free of overlapping toasts.
+          On portrait phones the row stacks and side panels become thin
+          strips above/below the stage so the playfield gets the height. */}
       <Box sx={{
         flex: 1, minHeight: 0, minWidth: 0, width: '100%',
         display: 'flex',
         alignItems: 'stretch',
         justifyContent: 'center',
         gap: 'clamp(6px, 1.4cqw, 18px)',
+        '@media (orientation: portrait) and (max-width: 1024px)': {
+          flexDirection: 'column',
+          alignItems: 'stretch',
+          gap: '8px',
+        },
       }}>
         {/* Left panel — identifies the currently active item so the
-            player knows what they're sorting at a glance. */}
+            player knows what they're sorting at a glance.
+            On portrait phones the panel collapses to keep the playfield
+            as the dominant element; an inline status pill above the
+            stage covers the same job in less vertical space. */}
         <Box sx={{
           flex: '0 0 auto',
           width: 'clamp(140px, 18cqw, 220px)',
@@ -641,6 +701,9 @@ export default function RecycleRushGame() {
           alignItems: 'center',
           justifyContent: 'flex-start',
           pt: 1,
+          '@media (orientation: portrait) and (max-width: 1024px)': {
+            display: 'none',
+          },
         }}>
           <Typography sx={{ fontSize: 11, color: '#8892B0', letterSpacing: '0.12em', mb: 1, fontWeight: 700 }}>
             NOW FALLING
@@ -888,11 +951,14 @@ export default function RecycleRushGame() {
 
           {/* Bin tray — exactly aligned to the 5 lanes above. The lane
               under the active item is highlighted so the player can see
-              where the item will land if untouched. */}
+              where the item will land if untouched. `boxSizing: border-box`
+              keeps the 1px border inside the natural width so the row
+              never overflows the playfield it sits beneath. */}
           <Box sx={{
             position: 'relative',
             width: PLAYFIELD_W_PX,
             height: BIN_TRAY_H,
+            boxSizing: 'border-box',
             display: 'grid',
             gridTemplateColumns: `repeat(${PLAYFIELD_W}, 1fr)`,
             background: 'linear-gradient(180deg, #F5F7FA, #E2E7EE)',
@@ -948,7 +1014,8 @@ export default function RecycleRushGame() {
             added to the top each time the player hits a 5-streak or
             mis-sorts; older facts stay below for the player to read at
             their own pace. Dedup'd by item type so each entry teaches
-            once. */}
+            once. Hidden on portrait phones so the playfield + bins
+            keep the full screen height. */}
         <Box sx={{
           flex: '0 0 auto',
           width: 'clamp(180px, 22cqw, 280px)',
@@ -957,6 +1024,9 @@ export default function RecycleRushGame() {
           pt: 1,
           gap: 1,
           minHeight: 0,
+          '@media (orientation: portrait) and (max-width: 1024px)': {
+            display: 'none',
+          },
         }}>
           <Typography sx={{ fontSize: 11, color: '#8892B0', letterSpacing: '0.12em', fontWeight: 700, flexShrink: 0 }}>
             DID YOU KNOW?

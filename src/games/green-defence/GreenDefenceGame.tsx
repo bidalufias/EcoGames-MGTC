@@ -172,7 +172,7 @@ export default function GreenDefenceGame() {
   // --- Intro ---
   if (screen === 'intro') {
     return (
-      <Box sx={{
+      <Box className="game-screen-stack" sx={{
         height: '100%', bgcolor: '#FAFBFC', color: '#1A2332',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         px: 3, py: 4, overflow: 'hidden',
@@ -217,7 +217,7 @@ export default function GreenDefenceGame() {
   // --- Leaderboard ---
   if (screen === 'leaderboard') {
     return (
-      <Box sx={{
+      <Box className="game-screen-stack" sx={{
         minHeight: '100%', bgcolor: '#FAFBFC', color: '#1A2332',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         px: 3, py: 4,
@@ -237,7 +237,7 @@ export default function GreenDefenceGame() {
   if (screen === 'gameover') {
     const won = wave >= WAVE_CONFIG.length && lives > 0;
     return (
-      <Box sx={{
+      <Box className="game-screen-stack" sx={{
         height: '100%', bgcolor: '#FAFBFC', color: '#1A2332',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', px: 3,
         overflow: 'hidden',
@@ -292,6 +292,11 @@ export default function GreenDefenceGame() {
       pt: 'clamp(48px, 7cqh, 72px)', pb: 'clamp(8px, 1.6cqh, 18px)',
       px: 'clamp(8px, 2cqw, 24px)', gap: 'clamp(4px, 1cqh, 10px)',
       overflow: 'hidden',
+      '@media (orientation: portrait) and (max-width: 1024px)': {
+        pt: '64px',
+        px: '6px',
+        gap: '6px',
+      },
     }}>
       {/* HUD */}
       <Box sx={{ display: 'flex', gap: 'clamp(10px, 2.4cqw, 24px)', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center', flexShrink: 0 }}>

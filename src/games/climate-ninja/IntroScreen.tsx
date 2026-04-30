@@ -17,7 +17,7 @@ const cardVariants = {
 
 export default function IntroScreen({ onStart }: Props) {
   return (
-    <Box sx={{
+    <Box className="game-screen-stack" sx={{
       height: '100%', bgcolor: '#FAFBFC', color: '#1A2332',
       overflowY: 'auto', px: { xs: 2, md: 4 }, py: 4,
     }}>

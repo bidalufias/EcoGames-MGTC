@@ -61,6 +61,23 @@ html, body {
   .landscape-only {
     display: none !important;
   }
+  /* Top-aligned screens that previously centered their content vertically
+     and hid overflow. On portrait phones, the absolutely-positioned
+     BackToHome chip + MGTC logo need ~64px of clearance, and content
+     taller than the viewport must be scrollable instead of clipped. */
+  .game-screen-stack {
+    justify-content: flex-start !important;
+    padding-top: 72px !important;
+    padding-bottom: 24px !important;
+    overflow-y: auto !important;
+  }
+  /* Landing page tiles: in a single-column scrolling grid the tile's
+     smaller dimension (used by `cqmin` typography) collapses, so give
+     each tile a comfortable min-height for both fingers and the
+     emoji/title hierarchy. */
+  .game-tile-motion {
+    min-height: 168px !important;
+  }
 }
 
 /* Selection color */

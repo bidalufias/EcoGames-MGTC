@@ -53,6 +53,7 @@ export default function GameTile({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.36, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
       style={{ height: '100%', display: 'flex', minHeight: 0, minWidth: 0 }}
+      className="game-tile-motion"
     >
       <Box
         role="button"

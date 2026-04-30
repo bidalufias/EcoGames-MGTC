@@ -16,7 +16,7 @@ export default function GameOver({ players, playerNames, onPlayAgain, onViewLead
   const winner = sorted[0];
 
   return (
-    <Box sx={{
+    <Box className="game-screen-stack" sx={{
       minHeight: '100%', bgcolor: '#FAFBFC', color: '#1A2332',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
       px: 3, py: 4,
