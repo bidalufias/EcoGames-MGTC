@@ -7,6 +7,7 @@ import BackToHome from './components/BackToHome';
 import MgtcLogo from './components/MgtcLogo';
 import LandingPage from './pages/LandingPage';
 import GamePage from './pages/GamePage';
+import { useAutoFullscreen } from './lib/useAutoFullscreen';
 
 const ClimateNinjaGame = lazy(() => import('./games/climate-ninja/ClimateNinjaGame'));
 const CarbonCrushGame = lazy(() => import('./games/carbon-crush/CarbonCrushGame'));
@@ -34,6 +35,11 @@ const DEFAULT_FRAME_BG = '#FAF7F0';
 function AppLayout() {
   const location = useLocation();
   const isGamePage = location.pathname.startsWith('/games/');
+
+  // Browsers disallow programmatic fullscreen without a user gesture,
+  // so this hook arms a one-shot listener that triggers fullscreen on
+  // the very first tap/key after load.
+  useAutoFullscreen();
 
   useEffect(() => {
     const bg = FRAME_BG[location.pathname] ?? DEFAULT_FRAME_BG;
