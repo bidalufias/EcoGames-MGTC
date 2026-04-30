@@ -17,15 +17,18 @@ interface ModeCardProps {
   accent: string;
   bullets: string[];
   onPick: () => void;
+  /** Hide on portrait phones — multiplayer needs landscape space. */
+  landscapeOnly?: boolean;
 }
 
-function ModeCard({ title, tagline, emoji, accent, bullets, onPick }: ModeCardProps) {
+function ModeCard({ title, tagline, emoji, accent, bullets, onPick, landscapeOnly }: ModeCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4 }}
       transition={{ duration: 0.35, ease: 'easeOut' }}
+      className={landscapeOnly ? 'landscape-only' : undefined}
       style={{ flex: 1, display: 'flex', minWidth: 0 }}
     >
       <Box
@@ -180,6 +183,7 @@ export default function ModeSelect({ onPick, onBack }: ModeSelectProps) {
             'Player 1: WASD · Player 2: Arrow keys',
           ]}
           onPick={() => onPick('challenge')}
+          landscapeOnly
         />
       </Box>
 

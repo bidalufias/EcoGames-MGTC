@@ -52,14 +52,17 @@ interface ModeCardProps {
   emoji: string;
   index: number;
   onPick: () => void;
+  /** Hide this card on portrait phones (multiplayer needs landscape). */
+  landscapeOnly?: boolean;
 }
 
-function ModeCard({ title, tagline, bullets, emoji, index, onPick }: ModeCardProps) {
+function ModeCard({ title, tagline, bullets, emoji, index, onPick, landscapeOnly }: ModeCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.34, delay: 0.1 + index * 0.06, ease: [0.16, 1, 0.3, 1] }}
+      className={landscapeOnly ? 'landscape-only' : undefined}
       style={{ flex: 1, display: 'flex', minWidth: 0, minHeight: 0 }}
     >
       <Box
@@ -504,6 +507,7 @@ export default function ModeSelect({ onPick }: ModeSelectProps) {
               'Most pairs at the end wins the round',
             ]}
             onPick={() => handlePick('versus')}
+            landscapeOnly
           />
         </Box>
 

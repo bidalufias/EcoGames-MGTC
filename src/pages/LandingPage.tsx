@@ -119,33 +119,6 @@ export default function LandingPage() {
     >
       <a href="#games" className="skip-link">Skip to games</a>
 
-      {/* Portrait orientation guard. */}
-      <Box
-        sx={{
-          display: 'none',
-          '@media (orientation: portrait) and (max-width: 1024px)': {
-            display: 'flex',
-            position: 'fixed',
-            inset: 0,
-            background: '#1F1B14',
-            color: '#FAF7F0',
-            zIndex: 99999,
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'column',
-            gap: 2,
-            textAlign: 'center',
-            px: 4,
-          },
-        }}
-      >
-        <Box sx={{ fontSize: '4rem' }} aria-hidden>🔄</Box>
-        <Typography sx={{ fontSize: '1.4rem', fontWeight: 700 }}>Please rotate your device</Typography>
-        <Typography sx={{ color: '#C5BBA9', fontSize: '0.95rem', maxWidth: 320 }}>
-          EcoGames is designed for landscape mode, so the games can fit the screen.
-        </Typography>
-      </Box>
-
       <Box component="header" sx={{ position: 'relative', zIndex: 2, flexShrink: 0 }}>
         <EcoHeader tagline="Six classic games, one climate mission." />
       </Box>
@@ -222,6 +195,13 @@ export default function LandingPage() {
           alignItems: 'stretch',
           px: 'clamp(12px, 2.5cqw, 36px)',
           py: 'clamp(8px, 1.6cqh, 22px)',
+          // On portrait phones the stage fills the viewport, so the grid
+          // needs to scroll vertically rather than try to cram 6 tiles into
+          // a single screen of available height.
+          '@media (orientation: portrait) and (max-width: 1024px)': {
+            overflowY: 'auto',
+            alignItems: 'flex-start',
+          },
         }}
       >
         <Box
@@ -233,6 +213,12 @@ export default function LandingPage() {
             gridTemplateRows: 'repeat(2, 1fr)',
             gap: 'clamp(10px, 1.6cqh, 22px)',
             minHeight: 0,
+            // Phones in portrait: stack to a single column with intrinsic
+            // tile height so each card stays comfortably tappable.
+            '@media (orientation: portrait) and (max-width: 1024px)': {
+              gridTemplateColumns: '1fr',
+              gridTemplateRows: 'auto',
+            },
           }}
         >
           {games.map((game, i) => (

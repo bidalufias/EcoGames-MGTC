@@ -49,6 +49,20 @@ html, body {
   background: var(--frame-bg);
 }
 
+/* Portrait mobile: drop the 16:9 lock so the stage fills the screen.
+   Games + landing page already use container queries, so they reflow
+   naturally — and multiplayer modes are hidden via `.landscape-only`. */
+@media (orientation: portrait) and (max-width: 1024px) {
+  .app-stage {
+    aspect-ratio: auto;
+    width: 100vw;
+    height: 100dvh;
+  }
+  .landscape-only {
+    display: none !important;
+  }
+}
+
 /* Selection color */
 ::selection {
   background: rgba(139, 197, 63, 0.3);
