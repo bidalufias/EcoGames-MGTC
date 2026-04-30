@@ -38,7 +38,13 @@ export default function StartScreen({ onSelectMode }: Props) {
       <Typography variant="h6" sx={{ mb: 2 }}>Select Mission</Typography>
       <Grid container spacing={2} sx={{ maxWidth: 800, mb: 4 }}>
         {modes.map((m, i) => (
-          <Grid size={{ xs: 12, sm: 6 }} key={m.mode}>
+          <Grid
+            size={{ xs: 12, sm: 6 }}
+            key={m.mode}
+            // Multiplayer modes need landscape space for split-screen — hide
+            // them on portrait phones, leaving Solo as the only option.
+            className={m.mode === '1p' ? undefined : 'landscape-only'}
+          >
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
               <Box
                 role="button"
