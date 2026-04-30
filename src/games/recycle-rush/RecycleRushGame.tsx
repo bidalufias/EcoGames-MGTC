@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { BINS, WASTE_ITEMS, randomWaste, DIFFICULTY_LEVELS, PLAYFIELD_W } from './data';
 import EcoButton from '../../components/EcoButton';
 import LeaderboardPanel from '../../components/LeaderboardPanel';
+import BackToHome from '../../components/BackToHome';
+import MgtcLogo from '../../components/MgtcLogo';
 import { useFitScale } from '../../lib/useFitScale';
 
 const PLAYFIELD_NATURAL = { w: PLAYFIELD_W * 65, h: 500 };
@@ -117,6 +119,9 @@ export default function RecycleRushGame() {
   // --- Intro ---
   if (screen === 'intro') {
     return (
+      <>
+        <BackToHome />
+        <MgtcLogo />
       <Box sx={{
         height: '100%', bgcolor: '#FAFBFC', color: '#1A2332',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
@@ -156,12 +161,16 @@ export default function RecycleRushGame() {
 
         <EcoButton onClick={startGame} size="large">Start Sorting 📦</EcoButton>
       </Box>
+      </>
     );
   }
 
   // --- Leaderboard ---
   if (screen === 'leaderboard') {
     return (
+      <>
+        <BackToHome />
+        <MgtcLogo />
       <Box sx={{
         minHeight: '100%', bgcolor: '#FAFBFC', color: '#1A2332',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
@@ -175,12 +184,16 @@ export default function RecycleRushGame() {
           <EcoButton onClick={startGame}>Play Again</EcoButton>
         </Box>
       </Box>
+      </>
     );
   }
 
   // --- Game Over ---
   if (screen === 'gameover') {
     return (
+      <>
+        <BackToHome />
+        <MgtcLogo />
       <Box sx={{
         height: '100%', bgcolor: '#FAFBFC', color: '#1A2332',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
@@ -217,22 +230,29 @@ export default function RecycleRushGame() {
           </Box>
           <Box sx={{ display: 'flex', gap: 2 }}>
             <EcoButton onClick={startGame}>Play Again</EcoButton>
-            <EcoButton onClick={() => setScreen('intro')} variant="secondary">Info</EcoButton>
+            <EcoButton onClick={() => setScreen('intro')} variant="secondary">Menu</EcoButton>
           </Box>
         </Box>
       </Box>
+      </>
     );
   }
 
   // --- Playing ---
   return (
     <Box ref={gameRef} sx={{
+      position: 'relative',
       height: '100%', width: '100%', bgcolor: '#F0F3F7', color: '#1A2332',
       display: 'flex', flexDirection: 'column', alignItems: 'center',
-      pt: 'clamp(48px, 7cqh, 72px)', pb: 'clamp(12px, 2cqh, 24px)',
+      pt: 'clamp(16px, 2.5cqh, 28px)', pb: 'clamp(12px, 2cqh, 24px)',
       px: 'clamp(8px, 2cqw, 24px)', gap: 'clamp(6px, 1.2cqh, 12px)',
       touchAction: 'none', userSelect: 'none', overflow: 'hidden',
     }}>
+      {/* In-game Menu button — single way back to the intro screen
+          since the global header is hidden during play. */}
+      <Box sx={{ position: 'absolute', top: 'clamp(8px, 1.5cqh, 16px)', right: 'clamp(8px, 1.5cqw, 16px)', zIndex: 20 }}>
+        <EcoButton size="small" variant="ghost" onClick={() => setScreen('intro')}>Menu</EcoButton>
+      </Box>
       {/* HUD */}
       <Box sx={{ display: 'flex', gap: 'clamp(12px, 2.5cqw, 24px)', alignItems: 'center', flexShrink: 0 }}>
         <Box sx={{ textAlign: 'center' }}>
