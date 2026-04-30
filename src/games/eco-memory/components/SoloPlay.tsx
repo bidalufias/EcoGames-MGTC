@@ -17,6 +17,8 @@ import {
   type GameState,
 } from '../engine';
 import LeaderboardPanel from '../../../components/LeaderboardPanel';
+import InGameMenuButton from '../../../components/InGameMenuButton';
+import MgtcLogo from '../../../components/MgtcLogo';
 import Board from './Board';
 import HUD from './HUD';
 import MatchBurst from './MatchBurst';
@@ -452,15 +454,19 @@ export default function SoloPlay({ difficulty, studyMode, onExit }: SoloPlayProp
         position: 'relative',
       }}
     >
-      {/* Action row — mute + restart + menu, right-aligned. The Menu button is
-          the only path back to ModeSelect now that the global header is hidden
-          mid-game. */}
+      {/* Top-left Menu (single way back to ModeSelect now that the global
+          header is hidden mid-game) and top-right MGTC logo, mirroring the
+          rest of the app. Mute + restart sit in a right-aligned action row
+          beneath the logo. */}
+      <InGameMenuButton onClick={onExit} ariaLabel="Back to Eco Memory main menu" />
+      <MgtcLogo />
       <Box
         sx={{
           display: 'flex',
           justifyContent: 'flex-end',
           gap: 'clamp(6px, 1.2cqmin, 10px)',
           flexShrink: 0,
+          mt: 'clamp(28px, 5cqh, 44px)',
         }}
       >
         <PaperButton
@@ -472,9 +478,6 @@ export default function SoloPlay({ difficulty, studyMode, onExit }: SoloPlayProp
         </PaperButton>
         <PaperButton onClick={startNewGame} ariaLabel="Start a new game">
           <Box component="span" aria-hidden>↻</Box> New game
-        </PaperButton>
-        <PaperButton variant="ghost" onClick={onExit} ariaLabel="Back to Eco Memory main menu">
-          <Box component="span" aria-hidden>↩</Box> Menu
         </PaperButton>
       </Box>
 

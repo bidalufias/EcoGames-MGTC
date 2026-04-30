@@ -15,6 +15,7 @@ import EcoButton from '../../components/EcoButton';
 import LeaderboardPanel from '../../components/LeaderboardPanel';
 import BackToHome from '../../components/BackToHome';
 import MgtcLogo from '../../components/MgtcLogo';
+import InGameMenuButton from '../../components/InGameMenuButton';
 import { useFitScale } from '../../lib/useFitScale';
 import { sfxCorrect, sfxWrong, sfxLevelUp, sfxPowerUp, sfxGameOver, haptic } from './audio';
 
@@ -572,10 +573,10 @@ export default function RecycleRushGame() {
       touchAction: 'none', userSelect: 'none', overflow: 'hidden',
     }}>
       {/* In-game Menu button — single way back to the intro screen
-          since the global header is hidden during play. */}
-      <Box sx={{ position: 'absolute', top: 'clamp(8px, 1.5cqh, 16px)', right: 'clamp(8px, 1.5cqw, 16px)', zIndex: 20 }}>
-        <EcoButton size="small" variant="ghost" onClick={() => setScreen('intro')}>Menu</EcoButton>
-      </Box>
+          since the global header is hidden during play. Top-left to match
+          BackToHome positioning across the rest of the app. */}
+      <InGameMenuButton onClick={() => setScreen('intro')} ariaLabel="Back to Recycle Rush menu" />
+      <MgtcLogo />
       {/* HUD */}
       <Box sx={{ display: 'flex', gap: 'clamp(12px, 2.5cqw, 24px)', alignItems: 'center', flexShrink: 0, flexWrap: 'wrap', justifyContent: 'center' }}>
         <Box sx={{ textAlign: 'center' }}>

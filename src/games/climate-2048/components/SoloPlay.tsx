@@ -2,6 +2,8 @@ import { Box, Typography } from '@mui/material';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import EcoButton from '../../../components/EcoButton';
 import LeaderboardPanel from '../../../components/LeaderboardPanel';
+import InGameMenuButton from '../../../components/InGameMenuButton';
+import MgtcLogo from '../../../components/MgtcLogo';
 import HUD from './HUD';
 import Board from './Board';
 import GameOverModal from './GameOverModal';
@@ -134,6 +136,7 @@ export default function SoloPlay({ track, onChangeMode }: SoloPlayProps) {
   return (
     <Box
       sx={{
+        position: 'relative',
         height: '100%',
         bgcolor: '#FAF8EF',
         display: 'flex',
@@ -144,9 +147,13 @@ export default function SoloPlay({ track, onChangeMode }: SoloPlayProps) {
         overflow: 'hidden',
       }}
     >
+      <InGameMenuButton onClick={onChangeMode} ariaLabel="Back to Climate 2048 main menu" />
+      <MgtcLogo />
+
       {/* HUD + controls + board, capped to 520px wide; the board itself
-          shrinks to fit the leftover height so nothing clips on short viewports. */}
-      <Box sx={{ width: '100%', maxWidth: 520, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 1.4 }}>
+          shrinks to fit the leftover height so nothing clips on short viewports.
+          A top offset clears the absolutely-positioned Menu button + logo above. */}
+      <Box sx={{ width: '100%', maxWidth: 520, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 1.4, mt: 'clamp(28px, 5cqh, 44px)' }}>
         <HUD
           title="Climate 2048"
           subtitle={subtitle}
@@ -157,7 +164,6 @@ export default function SoloPlay({ track, onChangeMode }: SoloPlayProps) {
         />
         <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', flexShrink: 0 }}>
           <EcoButton size="small" onClick={newGame}>New Game</EcoButton>
-          <EcoButton size="small" variant="ghost" onClick={onChangeMode}>Menu</EcoButton>
         </Box>
 
         {/* Board area — fills the remaining height; Board self-caps to a square. */}
