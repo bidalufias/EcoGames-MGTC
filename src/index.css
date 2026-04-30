@@ -1,10 +1,18 @@
+/* The letterbox color (`--frame-bg`) is updated per route by AppLayout so
+   the bars on the side of the 16:9 stage blend with the active page's
+   background instead of being a hard dark band. */
+:root {
+  --frame-bg: #FAF7F0;
+}
+
 html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
   height: 100%;
   width: 100%;
-  background: #0F172A;
+  background: var(--frame-bg);
+  transition: background 0.25s ease-out;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -23,7 +31,7 @@ html, body {
 .app-frame {
   position: fixed;
   inset: 0;
-  background: #0F172A;
+  background: var(--frame-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -38,7 +46,7 @@ html, body {
   overflow: hidden;
   container-type: size;
   container-name: stage;
-  background: #0F172A;
+  background: var(--frame-bg);
 }
 
 /* Selection color */
