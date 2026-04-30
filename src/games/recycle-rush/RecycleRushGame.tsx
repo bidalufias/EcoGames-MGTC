@@ -3,6 +3,8 @@ import { Box, Typography } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   BINS, WASTE_ITEMS, randomWaste, DIFFICULTY_LEVELS, PLAYFIELD_W,
+  CELL_W, CELL_H, ITEM_SIZE, MISS_ROW, FALL_STEP,
+  PLAYFIELD_W_PX, PLAYFIELD_H_PX,
   SPEED_PRESETS, comboMultiplier, randomPowerUp,
   type SpeedKey, type PowerUp,
 } from './data';
@@ -13,7 +15,7 @@ import MgtcLogo from '../../components/MgtcLogo';
 import { useFitScale } from '../../lib/useFitScale';
 import { sfxCorrect, sfxWrong, sfxLevelUp, sfxPowerUp, sfxGameOver, haptic } from './audio';
 
-const PLAYFIELD_NATURAL = { w: PLAYFIELD_W * 65, h: 500 };
+const PLAYFIELD_NATURAL = { w: PLAYFIELD_W_PX, h: PLAYFIELD_H_PX };
 const POWERUP_CHANCE = 0.07;       // post-level-1 spawn replaces waste with a power-up
 const SLOWMO_DURATION_MS = 5000;
 const AUTOSORT_BURST = 3;
@@ -185,13 +187,13 @@ export default function RecycleRushGame() {
     const interval = setInterval(() => {
       const slow = Date.now() < stateRef.current.slowMoUntil ? 0.5 : 1;
       setItems(prev => {
-        const updated = prev.map(item => ({ ...item, row: item.row + item.speed * 0.05 * slow }));
-        const wasteMissed = updated.filter(i => i.row >= 10 && i.kind === 'waste').length;
+        const updated = prev.map(item => ({ ...item, row: item.row + item.speed * FALL_STEP * slow }));
+        const wasteMissed = updated.filter(i => i.row >= MISS_ROW && i.kind === 'waste').length;
         if (wasteMissed > 0) {
           setLives(l => Math.max(0, l - wasteMissed));
           setStreak(0);
         }
-        return updated.filter(i => i.row < 10);
+        return updated.filter(i => i.row < MISS_ROW);
       });
       spawnTimer++;
       if (spawnTimer >= adjustedSpawn / 16) {
@@ -523,50 +525,6 @@ export default function RecycleRushGame() {
         )}
       </Box>
 
-      {/* Bin selector — 1-5 keyboard hints always visible; bin names show
-          on the first level (and again whenever the player is selecting). */}
-      <Box sx={{ display: 'flex', gap: 'clamp(4px, 1cqw, 10px)', flexWrap: 'wrap', justifyContent: 'center', flexShrink: 0 }}>
-        {BINS.map((bin, idx) => {
-          const showLabel = level === 0;
-          const active = selectedBin === bin.id;
-          return (
-            <Box
-              key={bin.id}
-              onClick={() => handleBinClick(bin.id)}
-              sx={{
-                position: 'relative',
-                px: 'clamp(8px, 1.4cqw, 14px)', py: 'clamp(4px, 0.8cqh, 8px)', borderRadius: 2, cursor: 'pointer',
-                background: active ? `${bin.color}20` : '#FFFFFF',
-                border: `2px solid ${active ? bin.color : '#E8EDF2'}`,
-                transition: 'all 0.15s',
-                textAlign: 'center',
-                minWidth: 52,
-                '&:hover': { borderColor: bin.color },
-              }}
-            >
-              <Box
-                sx={{
-                  position: 'absolute', top: -7, left: -7,
-                  width: 18, height: 18, borderRadius: '50%',
-                  background: '#1A2332', color: '#FFFFFF',
-                  fontSize: 11, fontWeight: 700,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
-                }}
-              >
-                {idx + 1}
-              </Box>
-              <Typography sx={{ fontSize: 'clamp(16px, 2.8cqh, 22px)', lineHeight: 1 }}>{bin.emoji}</Typography>
-              {showLabel && (
-                <Typography sx={{ fontSize: 10, fontWeight: 700, color: bin.color, mt: 0.3, letterSpacing: '0.02em' }}>
-                  {bin.name}
-                </Typography>
-              )}
-            </Box>
-          );
-        })}
-      </Box>
-
       {/* Playfield wrapper — fills remaining space; the natural-pixel
           playfield below is auto-scaled to fit. */}
       <Box
@@ -606,9 +564,9 @@ export default function RecycleRushGame() {
                   transition={isPower ? { scale: { repeat: Infinity, duration: 1.2 } } : undefined}
                   style={{
                     position: 'absolute',
-                    left: item.col * 65 + 7,
-                    top: item.row * 45,
-                    width: 52, height: 52,
+                    left: item.col * CELL_W + (CELL_W - ITEM_SIZE) / 2,
+                    top: item.row * CELL_H,
+                    width: ITEM_SIZE, height: ITEM_SIZE,
                     zIndex: 2,
                   }}
                 >
@@ -617,7 +575,7 @@ export default function RecycleRushGame() {
                     sx={{
                       width: '100%', height: '100%', borderRadius: 2,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 32, cursor: 'pointer',
+                      fontSize: 38, cursor: 'pointer',
                       background: isPower
                         ? 'radial-gradient(circle, #9C27B025, #9C27B005 70%)'
                         : isSelected ? '#FF8C4220' : (selectedBin ? '#F8F9FB' : 'transparent'),
@@ -647,9 +605,9 @@ export default function RecycleRushGame() {
                 transition={{ duration: 0.7, ease: 'easeOut' }}
                 style={{
                   position: 'absolute',
-                  left: f.col * 65 + 7,
-                  top: f.row * 45,
-                  width: 52,
+                  left: f.col * CELL_W + (CELL_W - ITEM_SIZE) / 2,
+                  top: f.row * CELL_H,
+                  width: ITEM_SIZE,
                   textAlign: 'center',
                   pointerEvents: 'none',
                   fontWeight: 800,
@@ -684,18 +642,79 @@ export default function RecycleRushGame() {
         </Box>
       </Box>
 
-      {/* Fact — green tint on streak milestones, red tint on wrong sorts */}
+      {/* Bin tray — sits below the playfield so falling waste visually
+          drops "into" the right bin. Numeric badges show the keyboard
+          shortcut; bin names show during level 1 to teach the mapping. */}
+      <Box sx={{
+        display: 'flex',
+        gap: 'clamp(6px, 1.4cqw, 14px)',
+        justifyContent: 'center',
+        flexShrink: 0,
+        width: '100%', maxWidth: 640,
+        px: 'clamp(4px, 1cqw, 12px)',
+        pt: 1.2,
+      }}>
+        {BINS.map((bin, idx) => {
+          const showLabel = level === 0;
+          const active = selectedBin === bin.id;
+          return (
+            <Box
+              key={bin.id}
+              onClick={() => handleBinClick(bin.id)}
+              sx={{
+                position: 'relative',
+                flex: '1 1 0', maxWidth: 120,
+                px: 'clamp(6px, 1.2cqw, 14px)',
+                py: 'clamp(8px, 1.4cqh, 14px)',
+                borderRadius: 2, cursor: 'pointer',
+                background: active
+                  ? `linear-gradient(180deg, ${bin.color}25, ${bin.color}10)`
+                  : 'linear-gradient(180deg, #FFFFFF, #F5F7FA)',
+                border: `2px solid ${active ? bin.color : '#E8EDF2'}`,
+                boxShadow: active
+                  ? `0 4px 12px ${bin.color}33, inset 0 -2px 0 ${bin.color}40`
+                  : '0 2px 4px rgba(0,0,0,0.04), inset 0 -2px 0 #E8EDF2',
+                transition: 'all 0.15s',
+                textAlign: 'center',
+                '&:hover': { borderColor: bin.color, transform: 'translateY(-1px)' },
+              }}
+            >
+              <Box
+                sx={{
+                  position: 'absolute', top: -8, left: -8,
+                  width: 20, height: 20, borderRadius: '50%',
+                  background: '#1A2332', color: '#FFFFFF',
+                  fontSize: 12, fontWeight: 700,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
+                }}
+              >
+                {idx + 1}
+              </Box>
+              <Typography sx={{ fontSize: 'clamp(20px, 3.4cqh, 28px)', lineHeight: 1 }}>{bin.emoji}</Typography>
+              {showLabel && (
+                <Typography sx={{ fontSize: 11, fontWeight: 700, color: bin.color, mt: 0.4, letterSpacing: '0.02em' }}>
+                  {bin.name}
+                </Typography>
+              )}
+            </Box>
+          );
+        })}
+      </Box>
+
+      {/* Fact — green tint on streak milestones, red tint on wrong sorts.
+          Anchored above the bin tray so it doesn't cover the bins. */}
       <AnimatePresence>
         {fact && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            style={{ position: 'absolute', bottom: 20, left: '50%', transform: 'translateX(-50%)', zIndex: 50, width: 'min(420px, 90%)' }}>
+            style={{ position: 'absolute', bottom: 'clamp(96px, 15cqh, 140px)', left: '50%', transform: 'translateX(-50%)', zIndex: 50, width: 'min(440px, 90%)' }}>
             <Box sx={{
               px: 3, py: 1.5, borderRadius: 2,
-              background: fact.tone === 'good' ? '#FF8C4215' : '#E74C3C15',
-              border: `1px solid ${fact.tone === 'good' ? '#FF8C4230' : '#E74C3C40'}`,
+              background: fact.tone === 'good' ? '#FF8C42E6' : '#C0392BE6',
+              boxShadow: '0 6px 18px rgba(0,0,0,0.18)',
               textAlign: 'center',
             }}>
-              <Typography sx={{ fontSize: 13, color: fact.tone === 'good' ? '#FF8C42' : '#C0392B', lineHeight: 1.4 }}>
+              <Typography sx={{ fontSize: 13, color: '#FFFFFF', fontWeight: 600, lineHeight: 1.4 }}>
                 {fact.text}
               </Typography>
             </Box>
