@@ -786,19 +786,44 @@ export default function RecycleRushGame() {
 
         {/* Stage — playfield + bin tray live inside one natural-pixel
             container that scales as a unit, so each bin is exactly under
-            its lane and falling items drop straight into the right slot. */}
+            its lane and falling items drop straight into the right slot.
+            On portrait phones the flex chain doesn't always settle on
+            the right cap, so explicitly bound the stage's height to the
+            viewport minus the HUD strip + status pill above + safe area
+            below — that guarantees the bin tray stays on-screen. */}
         <Box
           ref={fitRef}
-          sx={{ flex: 1, minHeight: 0, minWidth: 0, display: 'grid', placeItems: 'center' }}
+          className="recycle-rush-stage"
+          sx={{
+            flex: 1,
+            minHeight: 0,
+            minWidth: 0,
+            display: 'grid',
+            placeItems: 'center',
+            overflow: 'hidden',
+            // Portrait phones: explicitly set height (rather than relying
+            // on `flex: 1` to settle correctly when nested in a flex
+            // column whose children have intrinsic 710px height) so the
+            // stage is exactly the leftover viewport height. The CSS
+            // class sets the same height with `!important` so MUI's
+            // generated rules can't reintroduce flex grow.
+            '@media (orientation: portrait) and (max-width: 1024px)': {
+              flex: '0 0 auto',
+              height: 'calc(100svh - 232px)',
+            },
+          }}
         >
-          <Box sx={{
-            width: STAGE_NATURAL.w,
-            height: STAGE_NATURAL.h,
-          transform: `scale(${fitScale})`,
-          transformOrigin: 'center center',
-          display: 'flex',
-          flexDirection: 'column',
-        }}>
+          <Box
+            className="recycle-rush-natural"
+            sx={{
+              width: STAGE_NATURAL.w,
+              height: STAGE_NATURAL.h,
+              transform: `scale(${fitScale})`,
+              transformOrigin: 'center center',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
           {/* Playfield */}
           <Box sx={{
             position: 'relative',

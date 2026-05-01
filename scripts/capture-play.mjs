@@ -7,11 +7,14 @@ const OUT_DIR = 'scripts/portrait-shots';
 
 await mkdir(OUT_DIR, { recursive: true });
 
+// Smaller height than the device's 844px so the screenshots reflect
+// what's visible with iOS Safari's URL + tab bars on screen — the
+// scenario where bin trays / boards previously clipped under chrome.
 const browser = await chromium.launch({
   executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
 });
 const context = await browser.newContext({
-  viewport: { width: 390, height: 844 },
+  viewport: { width: 390, height: 680 },
   deviceScaleFactor: 2,
   isMobile: true,
   hasTouch: true,
