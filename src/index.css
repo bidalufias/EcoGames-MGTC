@@ -50,13 +50,26 @@ html, body {
 }
 
 /* Portrait mobile: drop the 16:9 lock so the stage fills the screen.
+   Use `100svh` (small viewport height) so the layout always assumes
+   browser chrome is present — this guarantees on-screen content fits
+   even when iOS Safari's URL bar + tab bar are visible. The earlier
+   `100dvh` would expand under the chrome and clip the bottom of the
+   game (e.g. Recycle Rush bin tray sliding under the Safari toolbar).
    Games + landing page already use container queries, so they reflow
    naturally — and multiplayer modes are hidden via `.landscape-only`. */
 @media (orientation: portrait) and (max-width: 1024px) {
   .app-stage {
     aspect-ratio: auto;
     width: 100vw;
+    height: 100svh;
+    /* Fallback for browsers without svh support. */
     height: 100dvh;
+    height: 100svh;
+    /* Reserve space for the iOS home-indicator safe area so nothing
+       lands on top of it. Combined with svh above, the playable area
+       ends comfortably above the system gesture bar. */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-sizing: border-box;
   }
   .landscape-only {
     display: none !important;
@@ -77,6 +90,46 @@ html, body {
      emoji/title hierarchy. */
   .game-tile-motion {
     min-height: 168px !important;
+  }
+  /* Recycle Rush stage: useFitScale was picking a width-fit scale
+     because the flex parent's reported height included the natural
+     box's intrinsic 710px (children with explicit height escape the
+     `minHeight: 0` cap). Lock the stage to the leftover viewport
+     height so the bin tray below stays on-screen on iOS Safari with
+     the URL + tab bars visible. */
+  .recycle-rush-stage {
+    height: calc(100svh - 232px) !important;
+    max-height: calc(100svh - 232px) !important;
+  }
+  /* Override the JS-driven `transform: scale()` with a CSS-driven one
+     so the natural 450x710 box always fits regardless of when (or if)
+     useFitScale's ResizeObserver settles. CSS calc needs <length>
+     divided by <length> to yield a unitless ratio for `scale()`,
+     hence the `px` denominators. The 16px gutter matches `px: 8`
+     outer padding on each side; the 232px vertical reservation
+     matches the Menu chip + HUD + status pill + gaps above. */
+  /* Override the JS-driven `transform: scale()` with a CSS-driven one
+     so the natural 450x710 box always fits regardless of when (or if)
+     useFitScale's ResizeObserver settles. CSS calc needs <length>
+     divided by <length> to yield a unitless ratio for `scale()`,
+     hence the `px` denominators. The 16px gutter matches `px: 8`
+     outer padding on each side; the 232px vertical reservation
+     matches the Menu chip + HUD + status pill + gaps above.
+     `transform-origin: 0 0` anchors the visual to the natural CSS
+     box's top-left, since browsers fall back to start-alignment for
+     oversized grid items even when `place-items: center` is set —
+     pairing top-left origin with `place-items: start center` keeps
+     the bin tray inside the stage's visible bounds. */
+  .recycle-rush-natural {
+    transform: scale(min(
+      calc((100vw - 16px) / 450px),
+      calc((100svh - 232px) / 710px),
+      1
+    )) !important;
+    transform-origin: 0 0 !important;
+  }
+  .recycle-rush-stage {
+    place-items: start center !important;
   }
 }
 

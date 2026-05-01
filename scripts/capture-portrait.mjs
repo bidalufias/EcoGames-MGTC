@@ -18,11 +18,15 @@ const routes = [
 
 await mkdir(OUT_DIR, { recursive: true });
 
+// iPhone 12 portrait dimensions are 390x844, but iOS Safari shows a
+// URL bar (~80px) and a tab bar (~84px) when the page first loads,
+// leaving only ~680px of usable viewport. Use that smaller height so
+// any content that would clip behind Safari's chrome is caught here.
 const browser = await chromium.launch({
   executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
 });
 const context = await browser.newContext({
-  viewport: { width: 390, height: 844 },
+  viewport: { width: 390, height: 680 },
   deviceScaleFactor: 2,
   isMobile: true,
   hasTouch: true,
