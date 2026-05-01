@@ -1,0 +1,1266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>EcoGames Wireframes</title>
+<style>
+  :root {
+    --paper: #FAF7F0;
+    --surface: #FFFCF5;
+    --ink: #1F1B14;
+    --sub-ink: #3F3A2F;
+    --meta: #7A6F5C;
+    --faded: #9C8E78;
+    --hairline: #ECE3D0;
+    --hairline-soft: #F3EBD8;
+    --canvas: rgba(31,27,20,0.04);
+    --hud: #FFFCF5;
+    --doc-bg: #F2EDDF;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: var(--doc-bg);
+    color: var(--ink);
+    padding: 32px;
+  }
+
+  .game {
+    background: transparent;
+    width: 1200px;
+    margin: 0 auto 56px;
+  }
+  .game-title {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .game-tag {
+    font-size: 14px;
+    color: var(--meta);
+    margin-bottom: 24px;
+    font-style: italic;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .frame {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #E2D9C2;
+    padding: 16px 16px 14px;
+    box-shadow: 0 2px 6px rgba(31,27,20,0.04);
+  }
+  .frame-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .frame-bp {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--meta);
+  }
+  .frame-bp .accent {
+    color: var(--accent, #15803D);
+    margin-right: 6px;
+  }
+  .frame-size {
+    font-size: 11px;
+    color: var(--faded);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* device frame: visualise the stage at a fixed display ratio */
+  .device {
+    background: var(--paper);
+    border: 1px solid #E2D9C2;
+    border-radius: 8px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+  }
+  /* device sizes (display, scaled). Ratios approximate target viewports. */
+  .device.mobile  { width: 220px; height: 440px; }
+  .device.ipad    { width: 380px; height: 285px; }
+  .device.laptop  { width: 540px; height: 304px; }
+  .device.large   { width: 540px; height: 304px; }
+  /* the laptop/large devices share landscape ratio; large includes letterbox cap visually */
+
+  /* shell components */
+  .chrome {
+    position: absolute;
+    inset: 0;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+  }
+  .chip {
+    height: 22px;
+    border-radius: 6px;
+    border: 1px solid var(--hairline);
+    background: var(--surface);
+    display: inline-flex;
+    align-items: center;
+    padding: 0 8px;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--sub-ink);
+  }
+  .logo {
+    height: 16px;
+    width: 36px;
+    border-radius: 3px;
+    background: linear-gradient(135deg, var(--accent, #15803D), var(--ink));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: 0.08em;
+  }
+  .top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+  }
+  .hud-strip {
+    background: var(--hud);
+    border: 1px solid var(--hairline);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 9px;
+    color: var(--sub-ink);
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .hud-strip .label { color: var(--meta); font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; font-size: 8px; }
+  .hud-strip .value { color: var(--ink); font-weight: 800; font-variant-numeric: tabular-nums; }
+  .hud-strip .accent { color: var(--accent, #15803D); }
+
+  .canvas {
+    flex: 1;
+    border: 1px dashed #C9BCA0;
+    border-radius: 6px;
+    background:
+      repeating-linear-gradient(
+        45deg,
+        transparent 0 6px,
+        rgba(31,27,20,0.025) 6px 7px
+      ),
+      var(--canvas);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: var(--meta);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 8px;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .canvas .emoji { font-size: 28px; margin-bottom: 4px; line-height: 1; }
+  .canvas .sub { color: var(--faded); margin-top: 4px; font-size: 8px; letter-spacing: 0.04em; text-transform: none; font-weight: 500; }
+
+  .dock {
+    margin-top: 6px;
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .dock .slot {
+    flex: 1;
+    height: 36px;
+    border-radius: 6px;
+    border: 1px solid var(--hairline);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--sub-ink);
+  }
+  .dock .slot.accent {
+    border-color: color-mix(in oklab, var(--accent), white 70%);
+    background: color-mix(in oklab, var(--accent), white 92%);
+    color: var(--accent);
+  }
+
+  .side-rail {
+    width: 30%;
+    border-radius: 6px;
+    border: 1px solid var(--hairline);
+    background: var(--surface);
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .row {
+    display: flex;
+    gap: 6px;
+    flex: 1;
+    min-height: 0;
+  }
+  .pill {
+    height: 22px;
+    border-radius: 4px;
+    background: color-mix(in oklab, var(--accent), white 88%);
+    border: 1px solid color-mix(in oklab, var(--accent), white 70%);
+    color: var(--accent);
+    font-size: 8px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .grid-board {
+    flex: 1;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 24px, rgba(31,27,20,0.06) 24px 25px),
+      repeating-linear-gradient(90deg, transparent 0 24px, rgba(31,27,20,0.06) 24px 25px),
+      var(--canvas);
+    border: 1px dashed #C9BCA0;
+    border-radius: 6px;
+    position: relative;
+    color: var(--meta);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .grid-board .label-tag {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 8px;
+  }
+
+  /* Letterbox effect on landscape devices */
+  .lb-wrap {
+    position: relative;
+    background: var(--paper);
+    border: 1px solid #E2D9C2;
+    border-radius: 8px;
+    padding: 6px 0;
+  }
+  .lb-wrap .lb-bar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background: repeating-linear-gradient(135deg, transparent 0 4px, rgba(31,27,20,0.04) 4px 5px);
+  }
+  .lb-wrap .lb-bar.left { left: 0; }
+  .lb-wrap .lb-bar.right { right: 0; }
+  .lb-wrap .device { border: none; border-radius: 4px; margin: 0 12px; }
+
+  /* Note caption */
+  .note {
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--meta);
+    line-height: 1.45;
+  }
+
+  /* Per-game accent override */
+  .ninja   { --accent: #15803D; }
+  .crush   { --accent: #1D4ED8; }
+  .recycle { --accent: #C2410C; }
+  .memory  { --accent: #6D28D9; }
+  .defence { --accent: #0F766E; }
+  .game2048{ --accent: #B91C1C; }
+
+  /* Specific component spans */
+  .stat-cell { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+  .stat-cell + .stat-cell { border-left: 1px solid var(--hairline-soft); padding-left: 8px; margin-left: 8px; }
+  .stat-row { display: flex; }
+
+  /* Match-3 board cells */
+  .m3 {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    gap: 2px;
+    position: absolute;
+    inset: 8px;
+  }
+  .m3 .cell { background: var(--surface); border: 1px solid var(--hairline); border-radius: 3px; }
+  .m3 .cell.a { background: color-mix(in oklab, var(--accent), white 78%); }
+  .m3 .cell.b { background: color-mix(in oklab, #C2410C, white 80%); }
+  .m3 .cell.c { background: color-mix(in oklab, #15803D, white 82%); }
+
+  /* Memory cards */
+  .mem-board {
+    display: grid;
+    gap: 4px;
+    position: absolute;
+    inset: 8px;
+  }
+  .mem-board.mobile  { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); }
+  .mem-board.ipad    { grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(2, 1fr); }
+  .mem-board.large   { grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(2, 1fr); }
+  .mem-board .card {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--accent);
+  }
+  .mem-board .card.flip { background: color-mix(in oklab, var(--accent), white 85%); }
+
+  /* 2048 board */
+  .b2048 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 4px;
+    position: absolute;
+    inset: 8px;
+  }
+  .b2048 .cell {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 11px;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .b2048 .cell.t2  { background: color-mix(in oklab, var(--accent), white 90%); color: var(--accent); }
+  .b2048 .cell.t4  { background: color-mix(in oklab, var(--accent), white 80%); color: var(--accent); }
+  .b2048 .cell.t8  { background: color-mix(in oklab, var(--accent), white 70%); color: var(--accent); }
+  .b2048 .cell.t16 { background: color-mix(in oklab, var(--accent), white 55%); color: white; }
+
+  /* Tower defence lanes */
+  .lanes {
+    flex: 1;
+    background:
+      repeating-linear-gradient(0deg,
+        var(--canvas) 0 18%,
+        rgba(31,27,20,0.06) 18% 20%,
+        var(--canvas) 20% 38%,
+        rgba(31,27,20,0.06) 38% 40%,
+        var(--canvas) 40% 58%,
+        rgba(31,27,20,0.06) 58% 60%,
+        var(--canvas) 60% 78%,
+        rgba(31,27,20,0.06) 78% 80%,
+        var(--canvas) 80% 100%);
+    border: 1px dashed #C9BCA0;
+    border-radius: 6px;
+    position: relative;
+  }
+  .lanes .arrow {
+    position: absolute;
+    left: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent);
+    font-size: 10px;
+  }
+  .lanes .tower {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    background: color-mix(in oklab, var(--accent), white 70%);
+    border: 1px solid var(--accent);
+  }
+
+  /* Recycle Rush spawning items */
+  .spawn-area {
+    position: relative;
+    flex: 1;
+  }
+  .spawn-area .item {
+    position: absolute;
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============== CLIMATE NINJA ============== -->
+<section class="game ninja" id="g-ninja">
+  <div class="game-title">Climate Ninja <span style="font-size:14px;font-weight:500;color:var(--meta);">— slice the gases</span></div>
+  <div class="game-tag">Forest accent · Action · 60s rounds</div>
+  <div class="grid">
+
+    <!-- MOBILE -->
+    <div class="frame">
+      <div class="frame-meta">
+        <div class="frame-bp"><span class="accent">●</span> Mobile</div>
+        <div class="frame-size">320–640px · portrait</div>
+      </div>
+      <div class="device mobile">
+        <div class="chrome">
+          <div class="top-row">
+            <div class="chip">← Menu</div>
+            <div class="logo">MGTC</div>
+          </div>
+          <div class="hud-strip">
+            <span><span class="label">NINJA</span></span>
+            <span><span class="label">SCORE</span> <span class="value accent">1,240</span></span>
+            <span><span class="label">TIME</span> <span class="value">00:42</span></span>
+          </div>
+          <div class="canvas">
+            <div class="emoji">☁ 🌫 ☁</div>
+            <div>SLICE CANVAS</div>
+            <div class="sub">full-bleed · swipe to slice</div>
+          </div>
+          <div class="dock">
+            <div class="slot">❤❤❤</div>
+            <div class="slot accent">×3 Combo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IPAD -->
+    <div class="frame">
+      <div class="frame-meta">
+        <div class="frame-bp"><span class="accent">●</span> iPad</div>
+        <div class="frame-size">641–1024px · landscape locked 16:9</div>
+      </div>
+      <div class="lb-wrap">
+        <div class="lb-bar left"></div>
+        <div class="lb-bar right"></div>
+        <div class="device ipad">
+          <div class="chrome">
+            <div class="top-row">
+              <div class="chip">← Menu</div>
+              <div class="logo">MGTC</div>
+            </div>
+            <div class="hud-strip">
+              <span><span class="label">NINJA · Solo · Easy</span></span>
+              <span><span class="label">SCORE</span> <span class="value accent">1,240</span> <span class="label">TIME</span> <span class="value">00:42</span> ❤❤❤</span>
+            </div>
+            <div class="canvas">
+              <div class="emoji">☁  🌫  ☁  🔥</div>
+              <div>SLICE CANVAS · centered 16:9</div>
+              <div class="sub">letterbox bars match page surface</div>
+            </div>
+            <div class="dock">
+              <div class="slot">×3 Combo</div>
+              <div class="slot accent">⏸ Pause</div>
+              <div class="slot">⚡ Powerup</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LAPTOP -->
+    <div class="frame">
+      <div class="frame-meta">
+        <div class="frame-bp"><span class="accent">●</span> Laptop</div>
+        <div class="frame-size">1025–1439px · letterboxed</div>
+      </div>
+      <div class="lb-wrap">
+        <div class="lb-bar left"></div>
+        <div class="lb-bar right"></div>
+        <div class="device laptop">
+          <div class="chrome">
+            <div class="top-row">
+              <div class="chip">← Menu</div>
+              <div class="logo">MGTC</div>
+            </div>
+            <div class="hud-strip">
+              <span><span class="label">NINJA · Solo · Easy</span></span>
+              <span><span class="label">SCORE</span> <span class="value accent">1,240</span></span>
+              <span><span class="label">BEST</span> <span class="value">9,800</span></span>
+              <span><span class="label">TIME</span> <span class="value">00:42</span></span>
+              <span>❤❤❤</span>
+            </div>
+            <div class="canvas">
+              <div class="emoji">☁     🌫     ☁     🔥</div>
+              <div>SLICE CANVAS</div>
+              <div class="sub">centered, max-width content cap inside stage</div>
+            </div>
+            <div class="dock">
+              <div class="slot">×3 Combo</div>
+              <div class="slot">⏸ Pause</div>
+              <div class="slot accent">⚡ ❄ 🌀  Powerups</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LARGE -->
+    <div class="frame">
+      <div class="frame-meta">
+        <div class="frame-bp"><span class="accent">●</span> Large screen</div>
+        <div class="frame-size">1440px+ · content capped 1320px</div>
+      </div>
+      <div class="lb-wrap" style="padding: 6px 12px;">
+        <div class="lb-bar left" style="width:14px;"></div>
+        <div class="lb-bar right" style="width:14px;"></div>
+        <div class="device large" style="margin: 0 16px;">
+          <div class="chrome">
+            <div class="top-row">
+              <div class="chip">← Menu</div>
+              <div class="logo">MGTC</div>
+            </div>
+            <div class="hud-strip">
+              <span><span class="label">NINJA</span></span>
+              <span><span class="label">SCORE</span> <span class="value accent">1,240</span></span>
+              <span><span class="label">BEST</span> <span class="value">9,800</span></span>
+              <span><span class="label">TIME</span> <span class="value">00:42</span></span>
+              <span><span class="label">LIVES</span> ❤❤❤</span>
+            </div>
+            <div class="canvas">
+              <div class="emoji">☁    🌫    ☁    🔥    ☁</div>
+              <div>SLICE CANVAS · same size as laptop</div>
+              <div class="sub">extra space → margin / letterbox, never bigger canvas</div>
+            </div>
+            <div class="dock">
+              <div class="slot">×3 Combo</div>
+              <div class="slot">⏸ Pause</div>
+              <div class="slot accent">⚡  ❄  🌀  Powerups</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============== CARBON CRUSH ============== -->
+<section class="game crush" id="g-crush">
+  <div class="game-title">Carbon Crush <span style="font-size:14px;font-weight:500;color:var(--meta);">— match three to phase out</span></div>
+  <div class="game-tag">Cobalt accent · Match-3 · 25 moves</div>
+  <div class="grid">
+
+    <div class="frame">
+      <div class="frame-meta"><div class="frame-bp"><span class="accent">●</span> Mobile</div><div class="frame-size">320–640px · portrait</div></div>
+      <div class="device mobile">
+        <div class="chrome">
+          <div class="top-row"><div class="chip">← Menu</div><div class="logo">MGTC</div></div>
+          <div class="hud-strip">
+            <span><span class="label">CRUSH</span></span>
+            <span><span class="label">SCORE</span> <span class="value accent">8,420</span></span>
+            <span><span class="label">MOVES</span> <span class="value">12</span></span>
+          </div>
+          <div class="canvas" style="position:relative;padding:0;">
+            <div class="m3">
+              <div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell c"></div><div class="cell b"></div>
+              <div class="cell c"></div><div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell b"></div>
+              <div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div>
+              <div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell b"></div><div class="cell c"></div>
+              <div class="cell c"></div><div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell b"></div>
+              <div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div>
+            </div>
+          </div>
+          <div class="dock">
+            <div class="slot accent">Phase ▓▓▓░░ 60%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-meta"><div class="frame-bp"><span class="accent">●</span> iPad</div><div class="frame-size">641–1024px · landscape</div></div>
+      <div class="lb-wrap">
+        <div class="lb-bar left"></div>
+        <div class="lb-bar right"></div>
+        <div class="device ipad">
+          <div class="chrome">
+            <div class="top-row"><div class="chip">← Menu</div><div class="logo">MGTC</div></div>
+            <div class="hud-strip">
+              <span><span class="label">CRUSH · Easy</span></span>
+              <span><span class="label">SCORE</span> <span class="value accent">8,420</span></span>
+              <span><span class="label">MOVES</span> <span class="value">12</span></span>
+            </div>
+            <div class="canvas" style="padding:0;">
+              <div class="m3" style="inset: 16px 80px;">
+                <div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell c"></div><div class="cell b"></div>
+                <div class="cell c"></div><div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell b"></div>
+                <div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div>
+                <div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell b"></div><div class="cell c"></div>
+                <div class="cell c"></div><div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell b"></div>
+                <div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div>
+              </div>
+            </div>
+            <div class="dock">
+              <div class="slot accent">Phase ▓▓▓▒░ 60%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-meta"><div class="frame-bp"><span class="accent">●</span> Laptop</div><div class="frame-size">1025–1439px · two-column</div></div>
+      <div class="lb-wrap">
+        <div class="lb-bar left"></div>
+        <div class="lb-bar right"></div>
+        <div class="device laptop">
+          <div class="chrome">
+            <div class="top-row"><div class="chip">← Menu</div><div class="logo">MGTC</div></div>
+            <div class="hud-strip">
+              <span><span class="label">CRUSH · Easy</span></span>
+              <span><span class="label">SCORE</span> <span class="value accent">8,420</span></span>
+              <span><span class="label">BEST</span> <span class="value">24,100</span></span>
+              <span><span class="label">MOVES</span> <span class="value">12</span></span>
+              <span><span class="label">COMBO</span> <span class="value">×2</span></span>
+            </div>
+            <div class="row">
+              <div class="side-rail">
+                <div class="pill">GOAL</div>
+                <div style="font-size:9px;color:var(--sub-ink);line-height:1.4;">Phase 50 fossil tiles in 25 moves.</div>
+                <div class="pill">PHASE 60%</div>
+              </div>
+              <div class="canvas" style="position:relative;padding:0;">
+                <div class="m3">
+                  <div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell c"></div><div class="cell b"></div>
+                  <div class="cell c"></div><div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell b"></div>
+                  <div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div>
+                  <div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell b"></div><div class="cell c"></div>
+                  <div class="cell c"></div><div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell b"></div>
+                  <div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-meta"><div class="frame-bp"><span class="accent">●</span> Large screen</div><div class="frame-size">1440px+ · content capped</div></div>
+      <div class="lb-wrap" style="padding:6px 12px;">
+        <div class="lb-bar left" style="width:14px;"></div>
+        <div class="lb-bar right" style="width:14px;"></div>
+        <div class="device large" style="margin:0 16px;">
+          <div class="chrome">
+            <div class="top-row"><div class="chip">← Menu</div><div class="logo">MGTC</div></div>
+            <div class="hud-strip">
+              <span><span class="label">CRUSH · Easy</span></span>
+              <span><span class="label">SCORE</span> <span class="value accent">8,420</span></span>
+              <span><span class="label">BEST</span> <span class="value">24,100</span></span>
+              <span><span class="label">MOVES</span> <span class="value">12</span></span>
+              <span><span class="label">COMBO</span> <span class="value">×2</span></span>
+            </div>
+            <div class="row">
+              <div class="side-rail" style="width:25%;">
+                <div class="pill">GOAL</div>
+                <div style="font-size:9px;color:var(--sub-ink);line-height:1.4;">Phase 50 fossil tiles in 25 moves.</div>
+                <div class="pill">PHASE 60%</div>
+                <div class="pill">CHAIN ×2</div>
+              </div>
+              <div class="canvas" style="position:relative;padding:0;">
+                <div class="m3">
+                  <div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell c"></div><div class="cell b"></div>
+                  <div class="cell c"></div><div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell b"></div>
+                  <div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div>
+                  <div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell b"></div><div class="cell c"></div>
+                  <div class="cell c"></div><div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell b"></div>
+                  <div class="cell b"></div><div class="cell c"></div><div class="cell a"></div><div class="cell b"></div><div class="cell c"></div><div class="cell a"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============== RECYCLE RUSH ============== -->
+<section class="game recycle" id="g-recycle">
+  <div class="game-title">Recycle Rush <span style="font-size:14px;font-weight:500;color:var(--meta);">— sort the bins</span></div>
+  <div class="game-tag">Rust accent · Time pressure · Day-by-day</div>
+  <div class="grid">
+
+    <div class="frame">
+      <div class="frame-meta"><div class="frame-bp"><span class="accent">●</span> Mobile</div><div class="frame-size">320–640px · stage = 100svh − bin tray</div></div>
+      <div class="device mobile">
+        <div class="chrome">
+          <div class="top-row"><div class="chip">← Menu</div><div class="logo">MGTC</div></div>
+          <div class="hud-strip">
+            <span><span class="label">RUSH</span></span>
+            <span><span class="label">SCORE</span> <span class="value accent">320</span></span>
+            <span><span class="label">TIME</span> <span class="value">00:28</span></span>
+          </div>
+          <div class="canvas spawn-area" style="padding:8px;">
+            <span class="item" style="top:10%;left:30%;">📰</span>
+            <span class="item" style="top:25%;left:60%;">🍎</span>
+            <span class="item" style="top:50%;left:15%;">🥫</span>
+            <span class="item" style="top:65%;left:75%;">🥤</span>
+            <span class="item" style="top:78%;left:40%;">🔋</span>
+          </div>
+          <div style="margin-top:4px;font-size:8px;color:var(--meta);">PATIENCE ▓▓▓░░░░</div>
+          <div class="dock">
+            <div class="slot accent">♻️ Recyc</div>
+            <div class="slot accent">🌱 Compo</div>
+            <div class="slot accent">☢ Hazrd</div>
+            <div class="slot accent">💻 Ewast</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-meta"><div class="frame-bp"><span class="accent">●</span> iPad</div><div class="frame-size">641–1024px · landscape</div></div>
+      <div class="lb-wrap">
+        <div class="lb-bar left"></div>
+        <div class="lb-bar right"></div>
+        <div class="device ipad">
+          <div class="chrome">
+            <div class="top-row"><div class="chip">← Menu</div><div class="logo">MGTC</div></div>
+            <div class="hud-strip">
+              <span><span class="label">RUSH · Day 2</span></span>
+              <span><span class="label">SCORE</span> <span class="value accent">320</span></span>
+              <span><span class="label">SAVED</span> <span class="value">14</span></span>
+              <span><span class="label">TIME</span> <span class="value">00:28</span></span>
+            </div>
+            <div class="canvas spawn-area" style="padding:8px;">
+              <span class="item" style="top:15%;left:20%;">📰</span>
+              <span class="item" style="top:25%;left:48%;">🍎</span>
+              <span class="item" style="top:30%;left:75%;">🥫</span>
+              <span class="item" style="top:55%;left:30%;">🔋</span>
+              <span class="item" style="top:65%;left:65%;">🥤</span>
+            </div>
+            <div style="font-size:8px;color:var(--meta);margin-top:2px;">PATIENCE ▓▓▓░░░</div>
+            <div class="dock">
+              <div class="slot accent">♻️ Recyc</div>
+              <div class="slot accent">🌱 Compo</div>
+              <div class="slot accent">☢ Hazrd</div>
+              <div class="slot accent">💻 Ewast</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-meta"><div class="frame-bp"><span class="accent">●</span> Laptop</div><div class="frame-size">1025–1439px</div></div>
+      <div class="lb-wrap">
+        <div class="lb-bar left"></div>
+        <div class="lb-bar right"></div>
+        <div class="device laptop">
+          <div class="chrome">
+            <div class="top-row"><div class="chip">← Menu</div><div class="logo">MGTC</div></div>
+            <div class="hud-strip">
+              <span><span class="label">RUSH · Day 2</span></span>
+              <span><span class="label">SCORE</span> <span class="value accent">320</span></span>
+              <span><span class="label">BEST</span> <span class="value">1,200</span></span>
+              <span><span class="label">SAVED</span> <span class="value">14/30</span></span>
+              <span><span class="label">TIME</span> <span class="value">00:28</span></span>
+            </div>
+            <div class="canvas spawn-area" style="padding:8px;">
+              <span class="item" style="top:15%;left:18%;">📰</span>
+              <span class="item" style="top:25%;left:38%;">🍎</span>
+              <span class="item" style="top:20%;left:62%;">🥫</span>
+              <span class="item" style="top:38%;left:80%;">🔋</span>
+              <span class="item" style="top:55%;left:25%;">🥤</span>
+              <span class="item" style="top:60%;left:50%;">📦</span>
+            </div>
+            <div style="font-size:8px;color:var(--meta);margin-top:2px;">PATIENCE ▓▓▓░░░░░░</div>
+            <div class="dock">
+              <div class="slot accent">♻️ Recycle (R)</div>
+              <div class="slot accent">🌱 Compost (C)</div>
+              <div class="slot accent">☢ Hazard (H)</div>
+              <div class="slot accent">💻 E-waste (E)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-meta"><div class="frame-bp"><span class="accent">●</span> Large screen</div><div class="frame-size">1440px+ · bin tray capped 960px</div></div>
+      <div class="lb-wrap" style="padding:6px 12px;">
+        <div class="lb-bar left" style="width:14px;"></div>
+        <div class="lb-bar right" style="width:14px;"></div>
+        <div class="device large" style="margin:0 16px;">
+          <div class="chrome">
+            <div class="top-row"><div class="chip">← Menu</div><div class="logo">MGTC</div></div>
+            <div class="hud-strip">
+              <span><span class="label">RUSH · Day 2</span></span>
+              <span><span class="label">SCORE</span> <span class="value accent">320</span></span>
+              <span><span class="label">BEST</span> <span class="value">1,200</span></span>
+              <span><span class="label">SAVED</span> <span class="value">14/30</span></span>
+              <span><span class="label">TIME</span> <span class="value">00:28</span></span>
+            </div>
+            <div class="canvas spawn-area" style="padding:8px;">
+              <span class="item" style="top:15%;left:20%;">📰</span>
+              <span class="item" style="top:22%;left:42%;">🍎</span>
+              <span class="item" style="top:18%;left:62%;">🥫</span>
+              <span class="item" style="top:38%;left:78%;">🔋</span>
+              <span class="item" style="top:55%;left:25%;">🥤</span>
+              <span class="item" style="top:60%;left:48%;">📦</span>
+            </div>
+            <div style="font-size:8px;color:var(--meta);margin-top:2px;">PATIENCE ▓▓▓░░░░░</div>
+            <div class="dock" style="max-width:80%;margin-left:auto;margin-right:auto;">
+              <div class="slot accent">♻️ Recycle</div>
+              <div class="slot accent">🌱 Compost</div>
+              <div class="slot accent">☢ Hazard</div>
+              <div class="slot accent">💻 E-waste</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============== ECO MEMORY ============== -->
+<section class="game memory" id="g-memory">
+  <div class="game-title">Eco Memory <span style="font-size:14px;font-weight:500;color:var(--meta);">— climate vocabulary pairs</span></div>
+  <div class="game-tag">Violet accent · Memory · 4×4 → 8×4 board</div>
+  <div class="grid">
+
+    <div class="frame">
+      <div class="frame-meta"><div class="frame-bp"><span class="accent">●</span> Mobile</div><div class="frame-size">320–640px</div></div>
+      <div class="device mobile">
+        <div class="chrome">
+          <div class="top-row"><div class="chip">← Menu</div><div class="logo">MGTC</div></div>
+          <div class="hud-strip">
+            <span><span class="label">MEMORY · Solo · Easy</span></span>
+          </div>
+          <div class="hud-strip" style="margin-top:-4px;">
+            <span class="stat-row">
+              <span class="stat-cell"><span class="label">SCORE</span><span class="value accent">240</span></span>
+              <span class="stat-cell"><span class="label">MOVES</span><span class="value">12</span></span>
+              <span class="stat-cell"><span class="label">STREAK</span><span class="value">×2</span></span>
+            </span>
+          </div>
+          <div class="canvas" style="position:relative;padding:0;">
+            <div class="mem-board mobile">
+              <div class="card flip">🌊</div><div class="card">?</div><div class="card">?</div><div class="card">?</div>
+              <div class="card">?</div><div class="card flip">🌊</div><div class="card">?</div><div class="card">?</div>
+              <div class="card">?</div><div class="card">?</div><div class="card flip">🔥</div><div class="card">?</div>
+              <div class="card">?</div><div class="card">?</div><div class="card">?</div><div class="card">?</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-meta"><div class="frame-bp"><span class="accent">●</span> iPad</div><div class="frame-size">641–1024px · 8×2 board</div></div>
+      <div class="lb-wrap">
+        <div class="lb-bar left"></div>
+        <div class="lb-bar right"></div>
+        <div class="device ipad">
+          <div class="chrome">
+            <div class="top-row"><div class="chip">← Menu</div><div class="logo">MGTC</div></div>
+            <div class="hud-strip">
+              <span><span class="label">MEMORY · Solo · Hard</span></span>
+              <span style="font-style:italic;color:var(--meta);font-size:9px;">8 pairs · climate vocabulary</span>
+            </div>
+            <div class="hud-strip" style="margin-top:-4px;">
+              <span class="stat-row">
+                <span class="stat-cell"><span class="label">SCORE</span><span class="value accent">240</span></span>
+                <span class="stat-cell"><span class="label">BEST</span><span class="value">900</span></span>
+                <span class="stat-cell"><span class="label">MOVES</span><span class="value">12</span></span>
+                <span class="stat-cell"><span class="label">PAIRS</span><span class="value">3/8</span></span>
+                <span class="stat-cell"><span class="label">STREAK</span><span class="value">×2</span></span>
+              </span>
+            </div>
+            <div class="canvas" style="position:relative;padding:0;">
+              <div class="mem-board ipad">
+                <div class="card flip">🌊</div><div class="card">?</div><div class="card">?</div><div class="card flip">🔥</div>
+                <div class="card">?</div><div class="card">?</div><div class="card">?</div><div class="card">?</div>
+                <div class="card">?</div><div class="card flip">🌊</div><div class="card">?</div><div class="card">?</div>
+                <div class="card">?</div><div class="card">?</div><div class="card flip">🔥</div><div class="card">?</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-meta"><div class="frame-bp"><span class="accent">●</span> Laptop</div><div class="frame-size">1025–1439px · 8×2 board, full HUD</div></div>
+      <div class="lb-wrap">
+        <div class="lb-bar left"></div>
+        <div class="lb-bar right"></div>
+        <div class="device laptop">
+          <div class="chrome">
+            <div class="top-row"><div class="chip">← Menu</div><div class="logo">MGTC</div></div>
+            <div class="hud-strip">
+              <span><span class="label">ECO MEMORY · Solo · Hard</span></span>
+              <span style="font-style:italic;color:var(--meta);font-size:9px;">8 pairs · climate vocabulary</span>
+            </div>
+            <div class="hud-strip" style="margin-top:-4px;">
+              <span class="stat-row">
+                <span class="stat-cell"><span class="label">SCORE</span><span class="value accent">240</span></span>
+                <span class="stat-cell"><span class="label">BEST</span><span class="value">900</span></span>
+                <span class="stat-cell"><span class="label">MOVES</span><span class="value">12</span></span>
+                <span class="stat-cell"><span class="label">PAIRS</span><span class="value">3/8</span></span>
+                <span class="stat-cell"><span class="label">STREAK</span><span class="value">×2</span></span>
+              </span>
+            </div>
+            <div class="canvas" style="position:relative;padding:0;">
+              <div class="mem-board large" style="inset:8px 32px;">
+                <div class="card flip">🌊</div><div class="card">?</div><div class="card">?</div><div class="card flip">🔥</div><div class="card">?</div><div class="card">?</div><div class="card">?</div><div class="card">?</div>
+                <div class="card">?</div><div class="card">?</div><div class="card flip">🌊</div><div class="card">?</div><div class="card">?</div><div class="card">?</div><div class="card flip">🔥</div><div class="card">?</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-meta"><div class="frame-bp"><span class="accent">●</span> Large screen</div><div class="frame-size">1440px+ · board capped 960px</div></div>
+      <div class="lb-wrap" style="padding:6px 12px;">
+        <div class="lb-bar left" style="width:14px;"></div>
+        <div class="lb-bar right" style="width:14px;"></div>
+        <div class="device large" style="margin:0 16px;">
+          <div class="chrome">
+            <div class="top-row"><div class="chip">← Menu</div><div class="logo">MGTC</div></div>
+            <div class="hud-strip">
+              <span><span class="label">ECO MEMORY · Solo · Hard</span></span>
+              <span style="font-style:italic;color:var(--meta);font-size:9px;">8 pairs · climate vocabulary</span>
+            </div>
+            <div class="hud-strip" style="margin-top:-4px;">
+              <span class="stat-row">
+                <span class="stat-cell"><span class="label">SCORE</span><span class="value accent">240</span></span>
+                <span class="stat-cell"><span class="label">BEST</span><span class="value">900</span></span>
+                <span class="stat-cell"><span class="label">MOVES</span><span class="value">12</span></span>
+                <span class="stat-cell"><span class="label">PAIRS</span><span class="value">3/8</span></span>
+                <span class="stat-cell"><span class="label">STREAK</span><span class="value">×2</span></span>
+              </span>
+            </div>
+            <div class="canvas" style="position:relative;padding:0;">
+              <div class="mem-board large" style="inset:8px 80px;">
+                <div class="card flip">🌊</div><div class="card">?</div><div class="card">?</div><div class="card flip">🔥</div><div class="card">?</div><div class="card">?</div><div class="card">?</div><div class="card">?</div>
+                <div class="card">?</div><div class="card">?</div><div class="card flip">🌊</div><div class="card">?</div><div class="card">?</div><div class="card">?</div><div class="card flip">🔥</div><div class="card">?</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============== GREEN DEFENCE ============== -->
+<section class="game defence" id="g-defence">
+  <div class="game-title">Green Defence <span style="font-size:14px;font-weight:500;color:var(--meta);">— towers vs. waves</span></div>
+  <div class="game-tag">Teal accent · Tower defence · 5 lanes × 8 waves</div>
+  <div class="grid">
+
+    <div class="frame">
+      <div class="frame-meta"><div class="frame-bp"><span class="accent">●</span> Mobile</div><div class="frame-size">320–640px · bottom tower dock</div></div>
+      <div class="device mobile">
+        <div class="chrome">
+          <div class="top-row"><div class="chip">← Menu</div><div class="logo">MGTC</div></div>
+          <div class="hud-strip">
+            <span><span class="label">DEFENCE · Wave 2/8</span></span>
+            <span>❤❤❤</span>
+          </div>
+          <div class="hud-strip" style="margin-top:-4px;">
+            <span><span class="label">SCORE</span> <span class="value accent">1,240</span></span>
+            <span><span class="label">$</span> <span class="value">80</span></span>
+          </div>
+          <div class="lanes">
+            <div class="arrow">▶</div>
+            <div class="tower" style="top:16%;left:22%;"></div>
+            <div class="tower" style="top:30%;left:40%;"></div>
+            <div class="tower" style="top:55%;left:18%;"></div>
+            <div class="tower" style="top:70%;left:45%;"></div>
+          </div>
+          <div class="dock">
+            <div class="slot accent">☀ $20</div>
+            <div class="slot accent">🌬 $40</div>
+            <div class="slot accent">🌳 $60</div>
+            <div class="slot accent">⚡ $80</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-meta"><div class="frame-bp"><span class="accent">●</span> iPad</div><div class="frame-size">641–1024px · side rail</div></div>
+      <div class="lb-wrap">
+        <div class="lb-bar left"></div>
+        <div class="lb-bar right"></div>
+        <div class="device ipad">
+          <div class="chrome">
+            <div class="top-row"><div class="chip">← Menu</div><div class="logo">MGTC</div></div>
+            <div class="hud-strip">
+              <span><span class="label">DEFENCE · Wave 2/8</span></span>
+              <span><span class="label">SCORE</span> <span class="value accent">1,240</span></span>
+              <span>❤❤❤</span>
+              <span><span class="label">$</span> <span class="value">80</span></span>
+            </div>
+            <div class="row">
+              <div class="side-rail">
+                <div class="pill">☀ $20</div>
+                <div class="pill">🌬 $40</div>
+                <div class="pill">🌳 $60</div>
+                <div class="pill">⚡ $80</div>
+                <div class="pill">🔋 $120</div>
+              </div>
+              <div class="lanes">
+                <div class="arrow">▶</div>
+                <div class="tower" style="top:16%;left:22%;"></div>
+                <div class="tower" style="top:30%;left:40%;"></div>
+                <div class="tower" style="top:55%;left:18%;"></div>
+                <div class="tower" style="top:70%;left:45%;"></div>
+                <div class="tower" style="top:42%;left:62%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-meta"><div class="frame-bp"><span class="accent">●</span> Laptop</div><div class="frame-size">1025–1439px · wider lanes</div></div>
+      <div class="lb-wrap">
+        <div class="lb-bar left"></div>
+        <div class="lb-bar right"></div>
+        <div class="device laptop">
+          <div class="chrome">
+            <div class="top-row"><div class="chip">← Menu</div><div class="logo">MGTC</div></div>
+            <div class="hud-strip">
+              <span><span class="label">DEFENCE · Wave 2/8</span></span>
+              <span><span class="label">SCORE</span> <span class="value accent">1,240</span></span>
+              <span><span class="label">BEST</span> <span class="value">9,200</span></span>
+              <span>❤❤❤</span>
+              <span><span class="label">$</span> <span class="value">80</span></span>
+            </div>
+            <div class="row">
+              <div class="side-rail" style="width:20%;">
+                <div class="pill">☀ $20</div>
+                <div class="pill">🌬 $40</div>
+                <div class="pill">🌳 $60</div>
+                <div class="pill">⚡ $80</div>
+                <div class="pill">🔋 $120</div>
+              </div>
+              <div class="lanes">
+                <div class="arrow">▶</div>
+                <div class="tower" style="top:16%;left:14%;"></div>
+                <div class="tower" style="top:30%;left:30%;"></div>
+                <div class="tower" style="top:55%;left:18%;"></div>
+                <div class="tower" style="top:70%;left:42%;"></div>
+                <div class="tower" style="top:42%;left:58%;"></div>
+                <div class="tower" style="top:25%;left:72%;"></div>
+              </div>
+            </div>
+            <div style="font-size:8px;color:var(--meta);margin-top:4px;">WAVE PREVIEW ▸ ▸ ▸</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-meta"><div class="frame-bp"><span class="accent">●</span> Large screen</div><div class="frame-size">1440px+ · capped 1320px</div></div>
+      <div class="lb-wrap" style="padding:6px 12px;">
+        <div class="lb-bar left" style="width:14px;"></div>
+        <div class="lb-bar right" style="width:14px;"></div>
+        <div class="device large" style="margin:0 16px;">
+          <div class="chrome">
+            <div class="top-row"><div class="chip">← Menu</div><div class="logo">MGTC</div></div>
+            <div class="hud-strip">
+              <span><span class="label">DEFENCE · Wave 2/8</span></span>
+              <span><span class="label">SCORE</span> <span class="value accent">1,240</span></span>
+              <span><span class="label">BEST</span> <span class="value">9,200</span></span>
+              <span>❤❤❤</span>
+              <span><span class="label">$</span> <span class="value">80</span></span>
+            </div>
+            <div class="row">
+              <div class="side-rail" style="width:18%;">
+                <div class="pill">☀ $20</div>
+                <div class="pill">🌬 $40</div>
+                <div class="pill">🌳 $60</div>
+                <div class="pill">⚡ $80</div>
+                <div class="pill">🔋 $120</div>
+              </div>
+              <div class="lanes">
+                <div class="arrow">▶</div>
+                <div class="tower" style="top:16%;left:12%;"></div>
+                <div class="tower" style="top:30%;left:28%;"></div>
+                <div class="tower" style="top:55%;left:18%;"></div>
+                <div class="tower" style="top:70%;left:38%;"></div>
+                <div class="tower" style="top:42%;left:54%;"></div>
+                <div class="tower" style="top:25%;left:70%;"></div>
+                <div class="tower" style="top:62%;left:80%;"></div>
+              </div>
+            </div>
+            <div style="font-size:8px;color:var(--meta);margin-top:4px;">WAVE PREVIEW ▸ ▸ ▸</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============== CLIMATE 2048 ============== -->
+<section class="game game2048" id="g-2048">
+  <div class="game-title">Climate 2048 <span style="font-size:14px;font-weight:500;color:var(--meta);">— merge the tech tree</span></div>
+  <div class="game-tag">Brick accent · Numeric merge · Wafer → Farm</div>
+  <div class="grid">
+
+    <div class="frame">
+      <div class="frame-meta"><div class="frame-bp"><span class="accent">●</span> Mobile</div><div class="frame-size">320–640px · stacked HUD</div></div>
+      <div class="device mobile">
+        <div class="chrome">
+          <div class="top-row"><div class="chip">← Menu</div><div class="logo">MGTC</div></div>
+          <div class="hud-strip">
+            <span><span class="label">2048 · Solo</span></span>
+          </div>
+          <div class="hud-strip" style="margin-top:-4px;">
+            <span><span class="label">SCORE</span> <span class="value accent">4,820</span></span>
+            <span><span class="label">BEST</span> <span class="value">12,400</span></span>
+          </div>
+          <div class="hud-strip" style="margin-top:-4px;">
+            <span><span class="label">TIER</span> <span class="value accent">🔋 Cell</span></span>
+          </div>
+          <div class="canvas" style="position:relative;padding:0;">
+            <div class="b2048">
+              <div class="cell"></div><div class="cell"></div><div class="cell t2">2</div><div class="cell"></div>
+              <div class="cell"></div><div class="cell t4">4</div><div class="cell"></div><div class="cell"></div>
+              <div class="cell"></div><div class="cell"></div><div class="cell t8">8</div><div class="cell t2">2</div>
+              <div class="cell"></div><div class="cell t16">16</div><div class="cell"></div><div class="cell t4">4</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-meta"><div class="frame-bp"><span class="accent">●</span> iPad</div><div class="frame-size">641–1024px</div></div>
+      <div class="lb-wrap">
+        <div class="lb-bar left"></div>
+        <div class="lb-bar right"></div>
+        <div class="device ipad">
+          <div class="chrome">
+            <div class="top-row"><div class="chip">← Menu</div><div class="logo">MGTC</div></div>
+            <div class="hud-strip">
+              <span><span class="label">2048 · Solo</span></span>
+              <span><span class="label">SCORE</span> <span class="value accent">4,820</span></span>
+              <span><span class="label">BEST</span> <span class="value">12,400</span></span>
+              <span><span class="label">TIER</span> <span class="value accent">🔋</span></span>
+            </div>
+            <div class="canvas" style="position:relative;padding:0;">
+              <div class="b2048" style="inset: 8px 80px;">
+                <div class="cell"></div><div class="cell"></div><div class="cell t2">2</div><div class="cell"></div>
+                <div class="cell"></div><div class="cell t4">4</div><div class="cell"></div><div class="cell"></div>
+                <div class="cell"></div><div class="cell"></div><div class="cell t8">8</div><div class="cell t2">2</div>
+                <div class="cell"></div><div class="cell t16">16</div><div class="cell"></div><div class="cell t4">4</div>
+              </div>
+            </div>
+            <div style="font-size:8px;color:var(--meta);margin-top:2px;text-align:center;">TECH TREE: 🔧 → 🔋 → ☀ → 🌬</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-meta"><div class="frame-bp"><span class="accent">●</span> Laptop</div><div class="frame-size">1025–1439px · side tech tree</div></div>
+      <div class="lb-wrap">
+        <div class="lb-bar left"></div>
+        <div class="lb-bar right"></div>
+        <div class="device laptop">
+          <div class="chrome">
+            <div class="top-row"><div class="chip">← Menu</div><div class="logo">MGTC</div></div>
+            <div class="hud-strip">
+              <span><span class="label">2048 · Solo</span></span>
+              <span><span class="label">SCORE</span> <span class="value accent">4,820</span></span>
+              <span><span class="label">BEST</span> <span class="value">12,400</span></span>
+              <span><span class="label">HIGHEST</span> <span class="value accent">🔋 Cell</span></span>
+            </div>
+            <div class="row">
+              <div class="side-rail">
+                <div class="pill">🔧 Wafer</div>
+                <div class="pill">🔋 Cell</div>
+                <div class="pill">☀ Panel</div>
+                <div class="pill">🏭 String</div>
+                <div class="pill">🌐 Farm</div>
+              </div>
+              <div class="canvas" style="position:relative;padding:0;">
+                <div class="b2048" style="inset: 8px 60px;">
+                  <div class="cell"></div><div class="cell"></div><div class="cell t2">2</div><div class="cell"></div>
+                  <div class="cell"></div><div class="cell t4">4</div><div class="cell"></div><div class="cell"></div>
+                  <div class="cell"></div><div class="cell"></div><div class="cell t8">8</div><div class="cell t2">2</div>
+                  <div class="cell"></div><div class="cell t16">16</div><div class="cell"></div><div class="cell t4">4</div>
+                </div>
+              </div>
+            </div>
+            <div style="font-size:8px;color:var(--meta);margin-top:4px;text-align:center;">↑ ↓ ← →  swipe / arrows</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-meta"><div class="frame-bp"><span class="accent">●</span> Large screen</div><div class="frame-size">1440px+ · board capped 520px</div></div>
+      <div class="lb-wrap" style="padding:6px 12px;">
+        <div class="lb-bar left" style="width:14px;"></div>
+        <div class="lb-bar right" style="width:14px;"></div>
+        <div class="device large" style="margin:0 16px;">
+          <div class="chrome">
+            <div class="top-row"><div class="chip">← Menu</div><div class="logo">MGTC</div></div>
+            <div class="hud-strip">
+              <span><span class="label">2048 · Solo</span></span>
+              <span><span class="label">SCORE</span> <span class="value accent">4,820</span></span>
+              <span><span class="label">BEST</span> <span class="value">12,400</span></span>
+              <span><span class="label">HIGHEST</span> <span class="value accent">🔋 Cell</span></span>
+            </div>
+            <div class="row">
+              <div class="side-rail" style="width:20%;">
+                <div class="pill">🔧 Wafer</div>
+                <div class="pill">🔋 Cell</div>
+                <div class="pill">☀ Panel</div>
+                <div class="pill">🏭 String</div>
+                <div class="pill">🌐 Farm</div>
+              </div>
+              <div class="canvas" style="position:relative;padding:0;">
+                <div class="b2048" style="inset: 8px 90px;">
+                  <div class="cell"></div><div class="cell"></div><div class="cell t2">2</div><div class="cell"></div>
+                  <div class="cell"></div><div class="cell t4">4</div><div class="cell"></div><div class="cell"></div>
+                  <div class="cell"></div><div class="cell"></div><div class="cell t8">8</div><div class="cell t2">2</div>
+                  <div class="cell"></div><div class="cell t16">16</div><div class="cell"></div><div class="cell t4">4</div>
+                </div>
+              </div>
+            </div>
+            <div style="font-size:8px;color:var(--meta);margin-top:4px;text-align:center;">↑ ↓ ← →  swipe / arrows · extra space → margin</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</body>
+</html>
